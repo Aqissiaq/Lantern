@@ -10,11 +10,19 @@ public class CameraController : MonoBehaviour {
     Rigidbody2D rb;
     Camera mainCam;
     public GameObject testObject;
+
+    //target variables
+    Vector3 target = new Vector3();
+    bool cueTarget;
+
+    //window variable
+    CamWindow cameraWindow;
     #endregion
 
 
     void Awake()
     {
+        cameraWindow = new CamWindow(200, Screen.width - 200);
         playerTransform = player.GetComponent<Transform>();
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
@@ -28,18 +36,33 @@ public class CameraController : MonoBehaviour {
     void CameraMove()
     {
         Vector3 current = transform.position;
-        Vector3 target = current;
-
+       
         #region targeting
-        //put this in an if statement later for cues and regionbased anchors
-        if (Input.GetKey(KeyCode.Space))
+        //mouse testing
+        if (Input.GetMouseButtonDown(0))
         {
-            target = testObject.transform.position;
+            SetTarget(mainCam.ScreenToWorldPoint(Input.mousePosition));
         }
-        else
-	    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            ResetTarget();
+        }
+
+        if (!cueTarget)
+        {
             target = playerTransform.position;
         }
+        #endregion
+
+        #region camera window
+        Vector3 playerScreenPos = mainCam.WorldToScreenPoint(playerTransform.position);
+
+        /*if (playerScreenPos.x <= cameraWindow.left)
+        {
+            Vector3 offset = playerTransform.position - mainCam.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+            transform.position = playerTransform.position + offset;
+        }*/
+
         #endregion
 
         #region physics-smoothing
@@ -53,10 +76,26 @@ public class CameraController : MonoBehaviour {
 
     }
 
-
-    //spring dampening equation (not used for now)
-    float SpringDampener(float a, float b, float t)
+    public void SetTarget(Vector3 newTarget)
     {
-        return Mathf.Exp(a * t) * (Mathf.Cos(b * t) - (a / b) * (Mathf.Sin(b * t)));
+        target = newTarget;
+        cueTarget = true;
+    }
+
+    public void ResetTarget()
+    {
+        Debug.Log("resetTarget");
+        cueTarget = false;
+    }
+
+    public struct CamWindow
+    {
+        public int left, right;
+
+        public CamWindow(int l, int r)
+        {
+            left = l;
+            right = r;
+        }
     }
 }
