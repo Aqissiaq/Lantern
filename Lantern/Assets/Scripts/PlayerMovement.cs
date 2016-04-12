@@ -14,6 +14,10 @@ public class PlayerMovement : MonoBehaviour {
     {
         Vector3 move = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0);
         return move * speed;
+    }
 
+    public Vector3 GetMoveVector()
+    {
+        return PlayerMove();
     }
 }

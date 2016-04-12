@@ -24,10 +24,12 @@ public class CameraTrigger : MonoBehaviour {
         if (distanceToPlayer <= triggerRadius)
         {
             camController.SetTarget(transform.position);
+            camController.SetOffset(Vector3.zero);
             inTrigger = true;
         }
         else if(distanceToPlayer > triggerRadius && inTrigger)
         {
+            camController.ResetOffset();
             camController.ResetTarget();
             inTrigger = false;
         }
