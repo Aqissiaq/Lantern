@@ -11,13 +11,11 @@ public class CameraController : MonoBehaviour {
     Transform playerTransform;
     Rigidbody2D rb;
     Camera mainCam;
-    public GameObject testObject;
 
-    //target variables
+    //targetting variables
     Vector3 target = new Vector3();
     Vector3 offset = new Vector3();
-    bool cueTarget;
-
+    bool targeted;
     #endregion
 
 
@@ -46,17 +44,7 @@ public class CameraController : MonoBehaviour {
         Vector3 current = transform.position;
 
         #region targeting
-        //mouse testing
-        if (Input.GetMouseButtonDown(0))
-        {
-            SetTarget(mainCam.ScreenToWorldPoint(Input.mousePosition));
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            ResetTarget();
-        }
-
-        if (!cueTarget)
+        if (!targeted)
         {
             target = playerTransform.position;
         }
@@ -79,12 +67,12 @@ public class CameraController : MonoBehaviour {
     public void SetTarget(Vector3 newTarget)
     {
         target = newTarget;
-        cueTarget = true;
+        targeted = true;
     }
 
     public void ResetTarget()
     {
-        cueTarget = false;
+        targeted = false;
     }
 
     public void SetOffset(Vector3 newOffset)
