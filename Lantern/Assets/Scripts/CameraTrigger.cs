@@ -5,6 +5,7 @@ public class CameraTrigger : MonoBehaviour {
 
     public float innerRadius;
     public float outerRadius;
+    bool inTrigger;
 
     GameObject mainCam;
     GameObject player;
@@ -28,12 +29,13 @@ public class CameraTrigger : MonoBehaviour {
         }
         else if (distanceToPlayer < outerRadius && distanceToPlayer > innerRadius)
         {
+            camController.SetOrthoSize(20);
             camController.SetTarget(Vector3.Lerp(transform.position, player.transform.position, (distanceToPlayer - innerRadius) / (outerRadius - innerRadius)));
-            camController.SetOffset(Vector3.zero);
+            camController.SetOffset(Vector3.Lerp(Vector3.zero, camController.standardOffset, (distanceToPlayer - innerRadius) / (outerRadius - innerRadius)));
         }
         else
         {
-            Debug.Log("reset");
+            camController.ResetOrthoSize();
             camController.ResetTarget();
             camController.ResetOffset();
         }

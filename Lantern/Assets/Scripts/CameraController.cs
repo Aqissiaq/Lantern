@@ -4,7 +4,9 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 
     #region variables
+    //default values
     public Vector3 standardOffset;
+    public float standardSize = 15;
     //references
     public GameObject player;
     PlayerMovement playerMovement;
@@ -43,24 +45,21 @@ public class CameraController : MonoBehaviour {
     {
         Vector3 current = transform.position;
 
-        #region targeting
+        //targetting
         if (!targeted)
         {
             target = playerTransform.position;
         }
         target += offset;
-        #endregion
+       
 
-        //transform.position = Vector3.Lerp(transform.position, target, Time.deltaTime);
-
-        #region physics-smoothing
+        //physics-smoothing
         //vector from camera to target
         Vector3 moveVector = target - current;
         Vector3 moveDirection = moveVector.normalized;
 
         //add force
-        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 2, .1f) * Time.deltaTime * 60);
-        #endregion
+        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 3, .1f) * Time.deltaTime * 60);
 
     }
 
@@ -83,5 +82,15 @@ public class CameraController : MonoBehaviour {
     public void ResetOffset()
     {
         offset = standardOffset;
+    }
+
+    public void SetOrthoSize(float size)
+    {
+        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, size, Time.deltaTime);
+    }
+
+    public void ResetOrthoSize()
+    {
+        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, standardSize, Time.deltaTime);
     }
 }

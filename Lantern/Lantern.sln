@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantern.CSharp.Plugins", "Lantern.CSharp.Plugins.csproj", "{23FEA82E-B51E-9D89-EE28-6050F645A6C5}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantern.CSharp", "Lantern.CSharp.csproj", "{24FE6FFF-C6DB-6C93-CB5F-AB154995D385}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantern.CSharp.Editor", "Lantern.CSharp.Editor.csproj", "{EE7F05FC-C573-7DED-4B9F-19EEAB61EAAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +13,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23FEA82E-B51E-9D89-EE28-6050F645A6C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23FEA82E-B51E-9D89-EE28-6050F645A6C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23FEA82E-B51E-9D89-EE28-6050F645A6C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23FEA82E-B51E-9D89-EE28-6050F645A6C5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{24FE6FFF-C6DB-6C93-CB5F-AB154995D385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{24FE6FFF-C6DB-6C93-CB5F-AB154995D385}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24FE6FFF-C6DB-6C93-CB5F-AB154995D385}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24FE6FFF-C6DB-6C93-CB5F-AB154995D385}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE7F05FC-C573-7DED-4B9F-19EEAB61EAAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE7F05FC-C573-7DED-4B9F-19EEAB61EAAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE7F05FC-C573-7DED-4B9F-19EEAB61EAAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE7F05FC-C573-7DED-4B9F-19EEAB61EAAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
