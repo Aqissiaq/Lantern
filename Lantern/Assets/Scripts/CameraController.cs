@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour {
-
     #region variables
     //default values
     public Vector3 standardOffset;
@@ -17,7 +17,8 @@ public class CameraController : MonoBehaviour {
     //targetting variables
     Vector3 target = new Vector3();
     Vector3 offset = new Vector3();
-    bool targeted;
+    [HideInInspector]
+    public bool targeted;
     #endregion
 
 
@@ -28,6 +29,8 @@ public class CameraController : MonoBehaviour {
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
         SetOffset(standardOffset);
+        SetTarget(playerTransform.position);
+        transform.position = target + offset;
     }
 
     void Update()
@@ -65,8 +68,8 @@ public class CameraController : MonoBehaviour {
 
     public void SetTarget(Vector3 newTarget)
     {
-        target = newTarget;
-        targeted = true;
+            target = newTarget;
+            targeted = true;
     }
 
     public void ResetTarget()

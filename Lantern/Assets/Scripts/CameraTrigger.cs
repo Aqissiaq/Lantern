@@ -14,7 +14,7 @@ public class CameraTrigger : MonoBehaviour {
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        mainCam = GameObject.FindGameObjectWithTag("MainCamera");
+        mainCam = GameObject.Find("Camera container");
         camController = mainCam.GetComponent<CameraController>();
     }
 

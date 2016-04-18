@@ -20,3 +20,7 @@ Unity/Unity.CSharp.csproj
 Unity/Unity.sln
 Unity/Assembly-CSharp-Editor.csproj
 Unity/Assembly-CSharp.csproj
+*.exe
+*.exe
+*.exe
+*.exe
