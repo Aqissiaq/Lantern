@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour {
     public float standardSize = 15;
     //references
     public GameObject player;
-    PlayerMovement playerMovement;
+    PlayerController playerController;
     Transform playerTransform;
     Rigidbody2D rb;
     Camera mainCam;
@@ -25,7 +25,7 @@ public class CameraController : MonoBehaviour {
     void Awake()
     {
         playerTransform = player.GetComponent<Transform>();
-        playerMovement = player.GetComponent<PlayerMovement>();
+        playerController = player.GetComponent<PlayerController>();
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
         SetOffset(standardOffset);
@@ -47,6 +47,10 @@ public class CameraController : MonoBehaviour {
     void CameraMove()
     {
         Vector3 current = transform.position;
+        if (playerController.moveVector != Vector3.zero)
+        {
+            offset.x = Mathf.Lerp(0, standardOffset.x, playerController.moveVector.magnitude) * Mathf.Sign(playerController.moveVector.x);
+        }
 
         //targetting
         if (!targeted)
@@ -62,7 +66,7 @@ public class CameraController : MonoBehaviour {
         Vector3 moveDirection = moveVector.normalized;
 
         //add force
-        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 3, .1f) * Time.deltaTime * 60);
+        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 5, .1f) * Time.deltaTime * 60);
 
     }
 
