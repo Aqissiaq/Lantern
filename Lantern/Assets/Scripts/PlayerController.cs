@@ -22,12 +22,18 @@ public class PlayerController : MonoBehaviour {
 
     //references
     CameraController camController;
+    Collider2D col;
 
     MoveState moveState;
     bool jumping;
     float jumpTimer;
+    RaycastHit2D groundSurface;
+    Vector2 groundNormal;
     //[HideInInspector]
     public Vector3 moveVector;
+
+    private static float pi = Mathf.PI;
+    Vector2 groundOffset = new Vector3(0, 2.6f);
     #endregion
 
     enum MoveState
@@ -38,6 +44,7 @@ public class PlayerController : MonoBehaviour {
     void Awake()
     {
         camController = GameObject.Find("Camera container").GetComponent<CameraController>();
+        col = GetComponent<Collider2D>();
     }
 
     void Update()
@@ -50,7 +57,7 @@ public class PlayerController : MonoBehaviour {
 
         CheckState();
         //debugging
-        Debug.DrawRay(transform.position, moveVector, Color.blue);
+        Debug.DrawRay(transform.position, moveVector * 10, Color.blue);
         Debug.Log(moveState);
         Debug.DrawLine(transform.position, transform.position + ledgeGrabOffset, Color.magenta);
 
@@ -68,6 +75,11 @@ public class PlayerController : MonoBehaviour {
         {
             camController.ResetOffset();
         }
+
+        if (col.IsTouchingLayers(groundCheck))
+        {
+
+        }
     }
 
     void Move()
@@ -75,14 +87,17 @@ public class PlayerController : MonoBehaviour {
         switch (moveState)
         {
             case MoveState.standing:
+                //align with surface
+                groundSurface = Physics2D.Raycast(transform.position, Vector3.down, 9001, groundCheck);
+                groundNormal = groundSurface.normal;
                 //probably set an idle animation
                 break;
 
             case MoveState.walking:
                 //defining ground normal
-                RaycastHit2D groundSurface = Physics2D.Raycast(transform.position, Vector3.down, 9001, groundCheck);
-                Vector2 groundNormal = groundSurface.normal;
-                Debug.DrawRay(transform.position, groundNormal * 100, Color.yellow);
+                groundSurface = Physics2D.Raycast(transform.position, Vector3.down, 9001, groundCheck);
+                groundNormal = groundSurface.normal;
+                Debug.DrawRay(transform.position, groundNormal * 10, Color.yellow);
 
                 //define moveVector
                 float horizontalMove = Input.GetAxis("Horizontal");
@@ -90,8 +105,10 @@ public class PlayerController : MonoBehaviour {
 
                 //move along ground surface based on moveVector
                 //rotation is acting weird, needs fix
-                float theta = Vector3.Dot(moveVector.normalized, groundNormal.normalized);
-                moveVector = new Vector3(moveVector.x * Mathf.Cos(theta) - moveVector.y * Mathf.Sin(theta), moveVector.x* Mathf.Sin(theta) + moveVector.y * Mathf.Cos(theta), 0);
+                float theta = Mathf.Acos(Vector3.Dot(moveVector.normalized, groundNormal.normalized));
+                theta = moveVector.x < 0 ? (pi / 2) - theta : -((pi / 2) - theta);
+                moveVector = new Vector3(moveVector.x * Mathf.Cos(theta) - moveVector.y * Mathf.Sin(theta), moveVector.x * Mathf.Sin(theta) + moveVector.y * Mathf.Cos(theta), 0);
+
 
                 transform.position = Vector3.Lerp(transform.position, transform.position + moveVector * moveSpeed, Time.deltaTime);
                 break;
@@ -157,7 +174,7 @@ public class PlayerController : MonoBehaviour {
 
     public bool IsGrounded()
     {
-       return Physics2D.Raycast(transform.position, Vector3.down, 2.6f, groundCheck);
+       return Physics2D.Raycast(transform.position, -groundNormal, 2.6f, groundCheck);
     }
 
     public RaycastHit2D CheckCollision(Vector3 check)
@@ -168,6 +185,7 @@ public class PlayerController : MonoBehaviour {
     public bool CheckLedge()
     {
         bool onLedge;
+        ledgeGrabOffset = new Vector3(ledgeGrabOffset.x * Mathf.Sign(moveVector.x), ledgeGrabOffset.y, 0);
         //spawn rectangular object to check for collision
         ledgeGrabRect = new Rect((transform.position + ledgeGrabOffset) - .5f * new Vector3(rectSize.x, rectSize.y), rectSize);
         GameObject ledgeCheckObject =  GameObject.Instantiate(ledgeCheckCollider);
