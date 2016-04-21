@@ -19,6 +19,8 @@ public class CameraController : MonoBehaviour {
     Vector3 offset = new Vector3();
     [HideInInspector]
     public bool targeted;
+    [HideInInspector]
+    public bool customOffset;
     #endregion
 
 
@@ -42,14 +44,20 @@ public class CameraController : MonoBehaviour {
         Debug.DrawRay(target, Vector3.down, Color.red);
         Debug.DrawRay(target, Vector3.left, Color.red);
         Debug.DrawRay(target, Vector3.right, Color.red);
+
+        Debug.DrawLine(playerTransform.position, playerTransform.position + offset, Color.white);
     }
 
     void CameraMove()
     {
         Vector3 current = transform.position;
-        if (playerController.moveVector != Vector3.zero)
+        if (!customOffset)
         {
-            offset.x = Mathf.Lerp(0, standardOffset.x, playerController.moveVector.magnitude) * Mathf.Sign(playerController.moveVector.x);
+            //does not work as intended, also falling does not update the offset
+            if (playerController.moveVector.x != 0)
+            {
+                offset = Mathf.Sign(playerController.moveVector.x) == -1 ? new Vector3(-standardOffset.x, standardOffset.y, 0) : new Vector3(standardOffset.x, standardOffset.y, 0);
+            }
         }
 
         //targetting
@@ -83,11 +91,13 @@ public class CameraController : MonoBehaviour {
 
     public void SetOffset(Vector3 newOffset)
     {
+        customOffset = true;
         offset = newOffset;
     }
 
     public void ResetOffset()
     {
+        customOffset = false;
         offset = standardOffset;
     }
 

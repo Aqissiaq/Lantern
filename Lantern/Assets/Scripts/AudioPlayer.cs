@@ -3,7 +3,6 @@ using System.Collections;
 
 [RequireComponent(typeof (AudioSource))]
 [RequireComponent(typeof (Collider2D))]
-[RequireComponent(typeof (Rigidbody2D))]
 public class AudioPlayer : MonoBehaviour {
 
     public AudioClip audioClip;
