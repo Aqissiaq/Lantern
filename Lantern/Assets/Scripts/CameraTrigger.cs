@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Collider2D))]
 public class CameraTrigger : MonoBehaviour {
 
-    public float innerRadius;
+    /*public float innerRadius;
     public float outerRadius;
-    bool inTrigger;
+    bool inTrigger;*/
+
+    public Vector3 target;
+    public float size;
 
     GameObject mainCam;
     GameObject player;
@@ -18,27 +23,25 @@ public class CameraTrigger : MonoBehaviour {
         camController = mainCam.GetComponent<CameraController>();
     }
 
-    void Update()
-    {
-        float distanceToPlayer = (player.transform.position - transform.position).magnitude;
-        if (distanceToPlayer <= innerRadius)
-        {
-            camController.SetTarget(transform.position);
-            camController.SetOffset(Vector3.zero);
 
-        }
-        else if (distanceToPlayer < outerRadius && distanceToPlayer > innerRadius)
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.tag == "Player")
         {
-            camController.SetOrthoSize(20);
-            camController.SetTarget(Vector3.Lerp(transform.position, player.transform.position, (distanceToPlayer - innerRadius) / (outerRadius - innerRadius)));
-            camController.SetOffset(Vector3.Lerp(Vector3.zero, camController.standardOffset, (distanceToPlayer - innerRadius) / (outerRadius - innerRadius)));
+            Debug.Log("In camera trigger");
+            camController.SetTarget(target);
+            camController.SetOffset(Vector3.zero);
+            camController.SetOrthoSize(size);
         }
-        else
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.tag == "Player")
         {
             camController.ResetOrthoSize();
-            camController.ResetTarget();
             camController.ResetOffset();
+            camController.ResetTarget();
         }
-        
     }
 }

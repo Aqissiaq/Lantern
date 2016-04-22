@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-//[ExecuteInEditMode]
 public class PlayerController : MonoBehaviour {
 
     #region variabels
@@ -9,6 +8,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Movement Variables")]
     public float moveSpeed;
     public float jumpStrength;
+    public float maxJumpTime;
     public float gravity;
 
     //checking values (customizable)
@@ -21,9 +21,10 @@ public class PlayerController : MonoBehaviour {
     Rect ledgeGrabRect;
 
     //references
-    public GameObject camHolder;
     CameraController camController;
     Collider2D col;
+    GameObject ledgeCheckObject;
+    Collider2D ledgeCheck;
 
     public MoveState moveState;
     bool jumping;
@@ -46,8 +47,11 @@ public class PlayerController : MonoBehaviour {
 
     void Awake()
     {
-        camController = camHolder.GetComponent<CameraController>();
+        camController = GameObject.Find("Camera container").GetComponent<CameraController>();
         col = GetComponent<Collider2D>();
+
+        ledgeCheckObject = GameObject.Instantiate(ledgeCheckCollider);
+        ledgeCheck = ledgeCheckObject.GetComponent<Collider2D>();
     }
 
     void Update()
@@ -79,7 +83,6 @@ public class PlayerController : MonoBehaviour {
             {
                 if (col.bounds.Intersects(groundSurface.collider.bounds))
                 {
-                    Debug.Log("Intersects");
                     Vector3 toSurface = new Vector3(0, groundSurface.collider.bounds.max.y - col.bounds.min.y, 0);
                     transform.position = Vector3.Lerp(transform.position, transform.position + toSurface, Time.deltaTime * 30);
                 }
@@ -129,21 +132,29 @@ public class PlayerController : MonoBehaviour {
                 {
                     transform.position = Vector3.Lerp(transform.position, transform.position + moveVector * moveSpeed, Time.deltaTime);
                 }
+                else
+                {
+                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime);
+                }
                 break;
 
             case MoveState.jumping:
                 //timer
                 jumpTimer += Time.deltaTime;
-                if (jumpTimer >= .2f)
+                if (jumpTimer >= maxJumpTime)
                 {
                     jumping = false;
                 }
 
                 //actual jumping
-                moveVector = new Vector3(Input.GetAxis("Horizontal") * 5, Mathf.Lerp(jumpStrength, jumpStrength * .5f, jumpTimer), 0);
+                moveVector = new Vector3(Input.GetAxis("Horizontal") * 10, Mathf.Lerp(jumpStrength, jumpStrength * .5f, jumpTimer), 0);
                 if (!CheckCollision(moveVector))
                 {
                     transform.position = Vector3.Lerp(transform.position, transform.position + moveVector, Time.deltaTime);
+                }
+                else
+                {
+                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime);
                 }
                 break;
 
@@ -153,10 +164,14 @@ public class PlayerController : MonoBehaviour {
                 break;
 
             case MoveState.falling:
-                moveVector = Vector3.Lerp(moveVector, new Vector3(Input.GetAxis("Horizontal") * 5, -gravity, 0), Time.deltaTime);
+                moveVector = Vector3.Lerp(moveVector, new Vector3(Input.GetAxis("Horizontal") * 10, -gravity, 0), Time.deltaTime);
                 if (!CheckCollision(moveVector.normalized * 2.6f))
                 {
                     transform.position = Vector3.Lerp(transform.position, transform.position + moveVector, Time.deltaTime);
+                }
+                else
+                {
+                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime * 30);
                 }
                 break;
 
@@ -234,14 +249,11 @@ public class PlayerController : MonoBehaviour {
 
         //spawn rectangular object to check for collision
         ledgeGrabRect = new Rect((transform.position + offset) - .5f * new Vector3(rectSize.x, rectSize.y), rectSize);
-        GameObject ledgeCheckObject =  GameObject.Instantiate(ledgeCheckCollider);
-        Collider2D ledgeCheck = ledgeCheckObject.GetComponent<Collider2D>();
         ledgeCheckObject.transform.position = ledgeGrabRect.position;
         ledgeCheckObject.transform.localScale = ledgeGrabRect.size;
 
         //return collision and destroy check-object
-        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.Raycast(transform.position, Vector3.right * Mathf.Sign(moveVector.x), 1.3f, groundCheck);
-        DestroyImmediate(ledgeCheckObject);
+        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.Raycast(transform.position, Vector3.right * Mathf.Sign(moveVector.x), 1.5f, groundCheck);
         return onLedge;
     }
 }

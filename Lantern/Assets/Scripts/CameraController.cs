@@ -19,8 +19,8 @@ public class CameraController : MonoBehaviour {
     Vector3 offset = new Vector3();
     [HideInInspector]
     public bool targeted;
-    [HideInInspector]
-    public bool customOffset;
+    //[HideInInspector]
+    public bool customOffset = false;
     #endregion
 
 
@@ -30,30 +30,20 @@ public class CameraController : MonoBehaviour {
         playerController = player.GetComponent<PlayerController>();
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
-        SetOffset(standardOffset);
-        SetTarget(playerTransform.position);
+        ResetOffset();
+        ResetTarget();
         transform.position = target + offset;
     }
 
     void Update()
     {
-        //stupid falling update that shouldn't need to be here, but it does
-        if (playerController.moveState == PlayerController.MoveState.falling)
-        {
-            SetOffset(new Vector3(3 * Mathf.Sign(playerController.moveVector.x), -5, 0));
-        }
-        else
-        {
-            ResetOffset();
-        }
-
         CameraMove();
 
         //debugging
-        Debug.DrawRay(target, Vector3.up, Color.red);
-        Debug.DrawRay(target, Vector3.down, Color.red);
-        Debug.DrawRay(target, Vector3.left, Color.red);
-        Debug.DrawRay(target, Vector3.right, Color.red);
+        Debug.DrawRay(target + offset, Vector3.up, Color.red);
+        Debug.DrawRay(target + offset, Vector3.down, Color.red);
+        Debug.DrawRay(target + offset, Vector3.left, Color.red);
+        Debug.DrawRay(target + offset, Vector3.right, Color.red);
 
         Debug.DrawLine(playerTransform.position, playerTransform.position + offset, Color.white);
     }
@@ -61,25 +51,30 @@ public class CameraController : MonoBehaviour {
     void CameraMove()
     {
         Vector3 current = transform.position;
-        if (!customOffset)
-        {
-            if (playerController.moveVector.x != 0)
-            {
-                offset = Mathf.Sign(playerController.moveVector.x) == -1 ? new Vector3(-standardOffset.x, standardOffset.y, 0) : new Vector3(standardOffset.x, standardOffset.y, 0);
-            }
-        }
-
         //targetting
         if (!targeted)
         {
             target = playerTransform.position;
         }
-        target += offset;
-       
+
+        //custom offsets
+        if (!customOffset)
+        {
+            float yOffset = playerController.moveState == PlayerController.MoveState.falling ? -standardOffset.y : standardOffset.y;
+            if (playerController.moveVector.x != 0)
+            {
+                offset = Mathf.Sign(playerController.moveVector.x) == -1 ? new Vector3(-standardOffset.x, yOffset, 0) : new Vector3(standardOffset.x, yOffset, 0);
+            }
+            else
+            {
+                offset = new Vector3(offset.x, yOffset, 0);
+            }
+        }
+
 
         //physics-smoothing
         //vector from camera to target
-        Vector3 moveVector = target - current;
+        Vector3 moveVector = (target + offset) - current;
         Vector3 moveDirection = moveVector.normalized;
 
         //add force
@@ -100,7 +95,7 @@ public class CameraController : MonoBehaviour {
 
     public void SetOffset(Vector3 newOffset)
     {
-        customOffset = true;
+        //customOffset = true;
         offset = newOffset;
     }
 
@@ -117,6 +112,6 @@ public class CameraController : MonoBehaviour {
 
     public void ResetOrthoSize()
     {
-        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, standardSize, Time.deltaTime);
+        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, standardSize, Time.deltaTime * 30);
     }
 }

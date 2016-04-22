@@ -18,7 +18,7 @@ public class ButtonFunctions : MonoBehaviour {
 
     public void StartGame()
     {
-        SceneManager.LoadScene("CameraScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
     }
 
     public void GotoOptions()
