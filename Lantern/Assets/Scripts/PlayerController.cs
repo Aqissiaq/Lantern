@@ -21,10 +21,11 @@ public class PlayerController : MonoBehaviour {
     Rect ledgeGrabRect;
 
     //references
+    public GameObject camHolder;
     CameraController camController;
     Collider2D col;
 
-    MoveState moveState;
+    public MoveState moveState;
     bool jumping;
     float jumpTimer;
     RaycastHit2D groundSurface;
@@ -36,17 +37,16 @@ public class PlayerController : MonoBehaviour {
     public Vector3 moveVector;
 
     private static float pi = Mathf.PI;
-    Vector2 groundOffset = new Vector2(0, 2.6f);
     #endregion
 
-    enum MoveState
+    public enum MoveState
     {
         standing, walking, jumping, ledgegrab, falling
     }
 
     void Awake()
     {
-        camController = GameObject.Find("Camera container").GetComponent<CameraController>();
+        camController = camHolder.GetComponent<CameraController>();
         col = GetComponent<Collider2D>();
     }
 
@@ -68,18 +68,24 @@ public class PlayerController : MonoBehaviour {
         {
             CheckState();
         }
+        
         //perform movement
         Move();
 
-        if (moveState == MoveState.falling)
+        //improve collisions
+        if (moveState == MoveState.walking || moveState == MoveState.standing)
         {
-            Debug.Log("this really should work");
-            /*PLEASE WORK*/camController.SetOffset(new Vector3(3 * Mathf.Sign(moveVector.x), -5, 0));/*PPLEEEEEAAAAAASE*/
+            if (groundNormal.normalized == Vector2.up)
+            {
+                if (col.bounds.Intersects(groundSurface.collider.bounds))
+                {
+                    Debug.Log("Intersects");
+                    Vector3 toSurface = new Vector3(0, groundSurface.collider.bounds.max.y - col.bounds.min.y, 0);
+                    transform.position = Vector3.Lerp(transform.position, transform.position + toSurface, Time.deltaTime * 30);
+                }
+            }
         }
-        else
-        {
-            camController.ResetOffset();
-        }
+
 
         //debugging
         if (Input.GetKeyDown(KeyCode.R))
@@ -142,10 +148,6 @@ public class PlayerController : MonoBehaviour {
                 break;
 
             case MoveState.ledgegrab:
-
-                Vector3 yClimb = new Vector3(0, offset.y, 0);
-                Vector3 xClimb = new Vector3(offset.x, 0, 0);
-
                 transform.position = Vector3.Lerp(transform.position, climbDestination, Input.GetAxis("Vertical"));
                 checkState = transform.position == climbDestination;
                 break;
@@ -207,7 +209,8 @@ public class PlayerController : MonoBehaviour {
 
     public bool IsGrounded()
     {
-       return Physics2D.Raycast(transform.position + (transform.right * 1.28f), -groundNormal, 2.7f, groundCheck) || Physics2D.Raycast(transform.position - (transform.right * 1.28f), -groundNormal, 2.7f, groundCheck);
+        //these values need to be updated to match the sprite
+        return Physics2D.CircleCast(transform.position, 1.3f, -groundNormal, 1.4f, groundCheck);
     }
 
     public RaycastHit2D CheckCollision(Vector3 check)
@@ -237,7 +240,7 @@ public class PlayerController : MonoBehaviour {
         ledgeCheckObject.transform.localScale = ledgeGrabRect.size;
 
         //return collision and destroy check-object
-        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.Raycast(transform.position, Vector3.right * Mathf.Sign(moveVector.x), 1.5f, groundCheck);
+        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.Raycast(transform.position, Vector3.right * Mathf.Sign(moveVector.x), 1.3f, groundCheck);
         DestroyImmediate(ledgeCheckObject);
         return onLedge;
     }

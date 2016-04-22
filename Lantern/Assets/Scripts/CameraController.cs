@@ -37,6 +37,16 @@ public class CameraController : MonoBehaviour {
 
     void Update()
     {
+        //stupid falling update that shouldn't need to be here, but it does
+        if (playerController.moveState == PlayerController.MoveState.falling)
+        {
+            SetOffset(new Vector3(3 * Mathf.Sign(playerController.moveVector.x), -5, 0));
+        }
+        else
+        {
+            ResetOffset();
+        }
+
         CameraMove();
 
         //debugging
@@ -53,7 +63,6 @@ public class CameraController : MonoBehaviour {
         Vector3 current = transform.position;
         if (!customOffset)
         {
-            //does not work as intended, also falling does not update the offset
             if (playerController.moveVector.x != 0)
             {
                 offset = Mathf.Sign(playerController.moveVector.x) == -1 ? new Vector3(-standardOffset.x, standardOffset.y, 0) : new Vector3(standardOffset.x, standardOffset.y, 0);
