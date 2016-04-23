@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour {
     public Vector3 moveVector;
 
     private static float pi = Mathf.PI;
+    private static float sqr2 = Mathf.Sqrt(2);
     #endregion
 
     public enum MoveState
@@ -171,7 +172,17 @@ public class PlayerController : MonoBehaviour {
                 }
                 else
                 {
-                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime * 30);
+                    if (Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2)
+                    {
+                        float alpha = Mathf.Acos(Vector3.Dot(moveVector.normalized, groundNormal.normalized));
+                        alpha = moveVector.x < 0 ? (pi / 2) - alpha : -((pi / 2) - alpha);
+                        moveVector = new Vector3(moveVector.x * Mathf.Cos(alpha) - moveVector.y * Mathf.Sin(alpha), moveVector.x * Mathf.Sin(alpha) + moveVector.y * Mathf.Cos(alpha), 0);
+                        transform.position = Vector3.Lerp(transform.position, transform.position + moveVector, Time.deltaTime);
+                    }
+                    else
+                    {
+                        //transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime * 30);
+                    }
                 }
                 break;
 
@@ -225,12 +236,17 @@ public class PlayerController : MonoBehaviour {
     public bool IsGrounded()
     {
         //these values need to be updated to match the sprite
-        return Physics2D.CircleCast(transform.position, 1.3f, -groundNormal, 1.4f, groundCheck);
+        //modified to work only on flat surfaces
+        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1.3f, -groundNormal, 1.4f, groundCheck);
+        bool groundIsFlat = !(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2);
+        //Debug.Log("GroundIsFlat" + groundIsFlat);
+        //Debug.Log(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)));
+        return ground && groundIsFlat;
     }
 
     public RaycastHit2D CheckCollision(Vector3 check)
     {
-        return Physics2D.Raycast(transform.position, check, check.magnitude, groundCheck);
+        return Physics2D.CircleCast(transform.position, 1.3f, check, check.magnitude - 1.3f, groundCheck);
     }
 
     public bool CheckLedge()
@@ -247,7 +263,7 @@ public class PlayerController : MonoBehaviour {
             Debug.DrawLine(transform.position, transform.position + offset, Color.magenta);
         }
 
-        //spawn rectangular object to check for collision
+        //move rectangular object to check for collision
         ledgeGrabRect = new Rect((transform.position + offset) - .5f * new Vector3(rectSize.x, rectSize.y), rectSize);
         ledgeCheckObject.transform.position = ledgeGrabRect.position;
         ledgeCheckObject.transform.localScale = ledgeGrabRect.size;
@@ -255,5 +271,20 @@ public class PlayerController : MonoBehaviour {
         //return collision and destroy check-object
         onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.Raycast(transform.position, Vector3.right * Mathf.Sign(moveVector.x), 1.5f, groundCheck);
         return onLedge;
+    }
+
+    //function to move player arbitrarily
+    public IEnumerator MovePlayer(Vector3 move, float time)
+    {
+        Debug.Log("moveStart");
+        float startTime = Time.time;
+        while (time >= 0)
+        {
+            time -= Time.deltaTime;
+            float a = Time.time - startTime / time;
+            transform.position = Vector3.Lerp(transform.position, transform.position + move, a);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        yield break;
     }
 }

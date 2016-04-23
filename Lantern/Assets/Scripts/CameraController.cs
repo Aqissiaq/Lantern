@@ -19,7 +19,7 @@ public class CameraController : MonoBehaviour {
     Vector3 offset = new Vector3();
     [HideInInspector]
     public bool targeted;
-    //[HideInInspector]
+    [HideInInspector]
     public bool customOffset = false;
     #endregion
 
@@ -32,13 +32,17 @@ public class CameraController : MonoBehaviour {
         mainCam = GetComponentInChildren<Camera>();
         ResetOffset();
         ResetTarget();
+        target = playerTransform.position;
         transform.position = target + offset;
     }
 
     void Update()
     {
         CameraMove();
-
+        if (Input.GetMouseButtonDown(0))
+        {
+            StartCoroutine(ScreenShake(100, 2));
+        }
         //debugging
         Debug.DrawRay(target + offset, Vector3.up, Color.red);
         Debug.DrawRay(target + offset, Vector3.down, Color.red);
@@ -113,5 +117,33 @@ public class CameraController : MonoBehaviour {
     public void ResetOrthoSize()
     {
         mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, standardSize, Time.deltaTime * 30);
+    }
+
+    public IEnumerator ScreenShake(float strength, float duration)
+    {
+        Debug.Log("shake started");
+        //initiate perlin noise variables
+        float perlinX = Random.Range(-100, 100);
+        float perlinY = Random.Range(-100, 100);
+        yield return new WaitForSeconds(Time.deltaTime);
+
+        //perform shake for duration
+        while (duration >= 0)
+        {
+            //decrease timer
+            duration -= Time.deltaTime;
+            //increment noise
+            perlinX += .8f;
+            perlinY += .8f;
+            //Debug.Log(perlinY);
+
+            //create new vector from perlin noise
+            Vector3 translation = new Vector3((Mathf.PerlinNoise(perlinX, perlinY) - .5f) * strength, (Mathf.PerlinNoise(perlinX + .5f, perlinY + .5f) - .5f) * strength, 0);
+            transform.position = Vector3.Lerp(transform.position, transform.position + translation, Time.deltaTime);
+            //transform.position = Vector3.Lerp(target + offset, target + offset + translation, Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        yield break;
+        
     }
 }
