@@ -20,17 +20,27 @@ public class FallEventTrigger : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            camController.ScreenShake(50, 3);
-            playerController.enabled = false;
-            playerController.StartCoroutine(playerController.MovePlayer(Vector3.right, 2));
+            StartCoroutine(FallSequence());
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    /*void OnTriggerExit2D(Collider2D other)
     {
         if (other.tag == "Player")
         {
             playerController.enabled = true;
         }
+    }*/
+
+    public IEnumerator FallSequence()
+    {
+        Debug.Log("coroutine");
+        camController.StartCoroutine(camController.ScreenShake(50, 3));
+        yield return new WaitForSeconds(3);
+        playerController.StartCoroutine(playerController.MovePlayer(Vector3.right, 1.1f));
+        playerController.enabled = false;
+        yield return new WaitForSeconds(1.1f);
+        playerController.enabled = true;
+        yield break;
     }
 }

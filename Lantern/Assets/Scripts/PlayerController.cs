@@ -78,8 +78,16 @@ public class PlayerController : MonoBehaviour {
         Move();
 
         //improve collisions
+        //collisions are still a bit weird when colliding with wallsgz
         if (moveState == MoveState.walking || moveState == MoveState.standing)
         {
+            Collider2D sideCollision = CheckSideCollisions();
+            if (sideCollision)
+            {
+
+            }
+
+            //flat ground
             if (groundNormal.normalized == Vector2.up)
             {
                 if (col.bounds.Intersects(groundSurface.collider.bounds))
@@ -135,7 +143,7 @@ public class PlayerController : MonoBehaviour {
                 }
                 else
                 {
-                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime);
+                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point - Vector2.right * (1.5f * Mathf.Sign(moveVector.x)), Time.deltaTime);
                 }
                 break;
 
@@ -181,7 +189,7 @@ public class PlayerController : MonoBehaviour {
                     }
                     else
                     {
-                        //transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime * 30);
+                        transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime * 30);
                     }
                 }
                 break;
@@ -273,15 +281,20 @@ public class PlayerController : MonoBehaviour {
         return onLedge;
     }
 
+    public Collider2D CheckSideCollisions()
+    {
+        return Physics2D.OverlapCircle(transform.position, 1.28f, groundCheck);
+    }
+
     //function to move player arbitrarily
     public IEnumerator MovePlayer(Vector3 move, float time)
     {
         Debug.Log("moveStart");
         float startTime = Time.time;
-        while (time >= 0)
+        while (time > 0)
         {
             time -= Time.deltaTime;
-            float a = Time.time - startTime / time;
+            float a = (Time.time - startTime) / time;
             transform.position = Vector3.Lerp(transform.position, transform.position + move, a);
             yield return new WaitForSeconds(Time.deltaTime);
         }

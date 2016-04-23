@@ -41,7 +41,7 @@ public class CameraController : MonoBehaviour {
         CameraMove();
         if (Input.GetMouseButtonDown(0))
         {
-            StartCoroutine(ScreenShake(100, 2));
+            StartCoroutine(ScreenShake(150, 1));
         }
         //debugging
         Debug.DrawRay(target + offset, Vector3.up, Color.red);
@@ -130,6 +130,7 @@ public class CameraController : MonoBehaviour {
         //perform shake for duration
         while (duration >= 0)
         {
+            Debug.Log("shaking");
             //decrease timer
             duration -= Time.deltaTime;
             //increment noise
