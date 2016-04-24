@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour {
+public class OldPlayerController : MonoBehaviour {
 
     #region variabels
     //movement variables for tuning
@@ -9,11 +9,13 @@ public class PlayerController : MonoBehaviour {
     public float moveSpeed;
     public float jumpStrength;
     public float maxJumpTime;
+    public float gravity;
 
     //checking values (customizable)
     [Header("Check Values")]
     public LayerMask groundCheck;
     public Vector3 ledgeGrabOffset;
+    Vector3 offset;
     public Vector2 rectSize;
     public GameObject ledgeCheckCollider;
     Rect ledgeGrabRect;
@@ -23,7 +25,6 @@ public class PlayerController : MonoBehaviour {
     Collider2D col;
     GameObject ledgeCheckObject;
     Collider2D ledgeCheck;
-    Rigidbody2D rb;
 
     public MoveState moveState;
     bool jumping;
@@ -33,11 +34,8 @@ public class PlayerController : MonoBehaviour {
     bool debugging = true;
     bool checkState = true;
     Vector3 climbDestination;
-    Vector3 offset;
-    bool xClimbed;
-    bool yClimbed;
     [HideInInspector]
-    public Vector2 moveVector;
+    public Vector3 moveVector;
 
     private static float pi = Mathf.PI;
     private static float sqr2 = Mathf.Sqrt(2);
@@ -50,17 +48,11 @@ public class PlayerController : MonoBehaviour {
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
         camController = GameObject.Find("Camera container").GetComponent<CameraController>();
         col = GetComponent<Collider2D>();
 
         ledgeCheckObject = GameObject.Instantiate(ledgeCheckCollider);
         ledgeCheck = ledgeCheckObject.GetComponent<Collider2D>();
-    }
-
-    void Start()
-    {
-        Physics2D.IgnoreCollision(col, ledgeCheck);
     }
 
     void Update()
@@ -81,16 +73,31 @@ public class PlayerController : MonoBehaviour {
         {
             CheckState();
         }
+        
+        //perform movement
+        Move();
 
-        //set to kinematic to move player
-        if (moveState == MoveState.ledgegrab)
+        //improve collisions
+        //collisions are still a bit weird when colliding with wallsgz
+        if (moveState == MoveState.walking || moveState == MoveState.standing)
         {
-            rb.isKinematic = true;
+            Collider2D sideCollision = CheckSideCollisions();
+            if (sideCollision)
+            {
+
+            }
+
+            //flat ground
+            if (groundNormal.normalized == Vector2.up)
+            {
+                if (col.bounds.Intersects(groundSurface.collider.bounds))
+                {
+                    Vector3 toSurface = new Vector3(0, groundSurface.collider.bounds.max.y - col.bounds.min.y, 0);
+                    transform.position = Vector3.Lerp(transform.position, transform.position + toSurface, Time.deltaTime * 30);
+                }
+            }
         }
-        else
-        {
-            rb.isKinematic = false;
-        }
+
 
         //debugging
         if (Input.GetKeyDown(KeyCode.R))
@@ -108,19 +115,7 @@ public class PlayerController : MonoBehaviour {
             Debug.DrawLine(new Vector3(ledgeGrabRect.xMin, ledgeGrabRect.yMin), new Vector3(ledgeGrabRect.xMin, ledgeGrabRect.yMax), Color.green); //left edge
             Debug.DrawLine(new Vector3(ledgeGrabRect.xMin, ledgeGrabRect.yMax), new Vector3(ledgeGrabRect.xMax, ledgeGrabRect.yMax), Color.green); //bottom edge
             Debug.DrawLine(new Vector3(ledgeGrabRect.xMax, ledgeGrabRect.yMax), new Vector3(ledgeGrabRect.xMax, ledgeGrabRect.yMin), Color.green); //right edge
-
-            //ledgegrab climbdestination
-            Debug.DrawRay(climbDestination, Vector3.up, Color.white);
-            Debug.DrawRay(climbDestination, Vector3.down, Color.white);
-            Debug.DrawRay(climbDestination, Vector3.left, Color.white);
-            Debug.DrawRay(climbDestination, Vector3.right, Color.white);
         }
-    }
-
-    void FixedUpdate()
-    {
-        //do moving
-        Move();
     }
 
     void Move()
@@ -128,71 +123,75 @@ public class PlayerController : MonoBehaviour {
         switch (moveState)
         {
             case MoveState.standing:
-                //align with surface?
+                //align with surface
                 //probably set an idle animation
-
-                rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime);
                 break;
 
             case MoveState.walking:
-                //set movevector based on input
-                moveVector = new Vector2(Input.GetAxis("Horizontal") * moveSpeed, 0);
-                //rotate movevector orthogonal to ground surface
+                //define moveVector
+                float horizontalMove = Input.GetAxis("Horizontal");
+                moveVector = new Vector3(horizontalMove, 0, 0);
+
+                //move along ground surface based on moveVector
                 float theta = Mathf.Acos(Vector3.Dot(moveVector.normalized, groundNormal.normalized));
                 theta = moveVector.x < 0 ? (pi / 2) - theta : -((pi / 2) - theta);
-                moveVector = new Vector2(moveVector.x * Mathf.Cos(theta) - moveVector.y * Mathf.Sin(theta),
-                    moveVector.x * Mathf.Sin(theta) + moveVector.y * Mathf.Cos(theta));
-                //preserve y-velocity if the ground is flat
-                if (!(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2))
+                moveVector = new Vector3(moveVector.x * Mathf.Cos(theta) - moveVector.y * Mathf.Sin(theta), moveVector.x * Mathf.Sin(theta) + moveVector.y * Mathf.Cos(theta), 0);
+
+                if (!CheckCollision(moveVector))
                 {
-                    moveVector = new Vector2(moveVector.x, rb.velocity.y);
+                    transform.position = Vector3.Lerp(transform.position, transform.position + moveVector * moveSpeed, Time.deltaTime);
                 }
-                //set velocity of rigidbody
-                rb.velocity = moveVector;
+                else
+                {
+                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point - Vector2.right * (1.5f * Mathf.Sign(moveVector.x)), Time.deltaTime);
+                }
                 break;
 
             case MoveState.jumping:
-                Vector2 jumpVector = new Vector2(0, jumpStrength);
-                rb.AddForce(jumpVector, ForceMode2D.Impulse);
-                jumping = false;
+                //timer
+                jumpTimer += Time.deltaTime;
+                if (jumpTimer >= maxJumpTime)
+                {
+                    jumping = false;
+                }
+
+                //actual jumping
+                moveVector = new Vector3(Input.GetAxis("Horizontal") * 10, Mathf.Lerp(jumpStrength, jumpStrength * .5f, jumpTimer), 0);
+                if (!CheckCollision(moveVector))
+                {
+                    transform.position = Vector3.Lerp(transform.position, transform.position + moveVector, Time.deltaTime);
+                }
+                else
+                {
+                    transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime);
+                }
                 break;
 
             case MoveState.ledgegrab:
-                CheckLedge();
-                checkState = false;
-                Vector3 xClimb = new Vector3(climbDestination.x, transform.position.y, 0) - transform.position;
-                Vector3 yClimb = new Vector3(transform.position.x, climbDestination.y, 0) - transform.position;
-                //check if vertical climbed
-                if (Mathf.Abs(transform.position.y - climbDestination.y) <= .1f)
-                {
-                    yClimbed = true;
-                }
-                //check if horizontal climbed
-                if (Mathf.Abs(transform.position.x - climbDestination.x) <= .1f)
-                {
-                    xClimbed = true;
-                }
-                //climb vertically
-                if (!yClimbed && Input.GetAxis("Vertical") > 0)
-                {
-                    rb.MovePosition(transform.position + yClimb * Time.deltaTime * 10);
-                }
-                //then horizontally
-                if (yClimbed && !xClimbed && Input.GetAxis("Horizontal") * Mathf.Sign(offset.x) > 0)
-                {
-                    rb.MovePosition(transform.position + xClimb * Time.deltaTime * 10);
-                }
-                //check if climb is complete
-                if (Mathf.Abs((transform.position - climbDestination).magnitude) <= 1)
-                {
-                    checkState = true;
-                    yClimbed = false;
-                    xClimbed = false;
-                }
+                transform.position = Vector3.Lerp(transform.position, climbDestination, Input.GetAxis("Vertical"));
+                checkState = transform.position == climbDestination;
                 break;
 
             case MoveState.falling:
-
+                moveVector = Vector3.Lerp(moveVector, new Vector3(Input.GetAxis("Horizontal") * 10, -gravity, 0), Time.deltaTime);
+                if (!CheckCollision(moveVector.normalized * 2.6f))
+                {
+                    transform.position = Vector3.Lerp(transform.position, transform.position + moveVector, Time.deltaTime);
+                }
+                else
+                {
+                    if (Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2)
+                    {
+                        float alpha = Mathf.Acos(Vector3.Dot(moveVector.normalized, groundNormal.normalized));
+                        alpha = moveVector.x < 0 ? (pi / 2) - alpha : -((pi / 2) - alpha);
+                        moveVector = new Vector3(moveVector.x * Mathf.Cos(alpha) - moveVector.y * Mathf.Sin(alpha), moveVector.x * Mathf.Sin(alpha) + moveVector.y * Mathf.Cos(alpha), 0);
+                        transform.position = Vector3.Lerp(transform.position, transform.position + moveVector, Time.deltaTime);
+                    }
+                    else
+                    {
+                        transform.position = Vector3.Lerp(transform.position, CheckCollision(moveVector).point, Time.deltaTime * 30);
+                    }
+                }
                 break;
 
             default:
@@ -205,7 +204,7 @@ public class PlayerController : MonoBehaviour {
     {
         //get groundnormal and shit
         groundSurface = Physics2D.Raycast(transform.position, Vector3.down, 9001, groundCheck);
-        groundNormal = Vector3.Lerp(groundNormal, groundSurface.normal, Time.deltaTime * 60);
+        groundNormal = Vector3.Lerp(groundNormal, groundSurface.normal, Time.deltaTime * 30);
 
         //get jump input
         if (Input.GetButtonDown("Jump") && IsGrounded())
@@ -220,7 +219,7 @@ public class PlayerController : MonoBehaviour {
         //determine movestate
         if (onLedge)
         {
-            climbDestination = transform.position + offset + new Vector3(0, 1.26f, 0);
+            climbDestination = transform.position + offset;
             moveState = MoveState.ledgegrab;
         }
         else if (jumping)
@@ -246,8 +245,8 @@ public class PlayerController : MonoBehaviour {
     {
         //these values need to be updated to match the sprite
         //modified to work only on flat surfaces
+        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1.3f, -groundNormal, 1.4f, groundCheck);
         bool groundIsFlat = !(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2);
-        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1.5f, -groundNormal, 1.4f, groundCheck);
         //Debug.Log("GroundIsFlat" + groundIsFlat);
         //Debug.Log(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)));
         return ground && groundIsFlat;
@@ -288,18 +287,17 @@ public class PlayerController : MonoBehaviour {
     }
 
     //function to move player arbitrarily
-    public IEnumerator MovePlayer(Vector3 move, float timer)
+    public IEnumerator MovePlayer(Vector3 move, float time)
     {
-        rb.velocity = Vector3.zero;
-        yield return new WaitForSeconds(Time.deltaTime);
-        while (timer > 0)
+        Debug.Log("moveStart");
+        float startTime = Time.time;
+        while (time > 0)
         {
-            timer -= Time.deltaTime;
-            rb.isKinematic = true;
-            rb.MovePosition(transform.position + move * Time.deltaTime);
+            time -= Time.deltaTime;
+            float a = (Time.time - startTime) / time;
+            transform.position = Vector3.Lerp(transform.position, transform.position + move, a);
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        rb.isKinematic = false;
         yield break;
     }
 }
