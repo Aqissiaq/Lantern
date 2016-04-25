@@ -2,6 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(Camera))]
+[ExecuteInEditMode]
 public class CameraController : MonoBehaviour {
     #region variables
     //default values
@@ -13,10 +14,13 @@ public class CameraController : MonoBehaviour {
     Transform playerTransform;
     Rigidbody2D rb;
     Camera mainCam;
+    Camera parallaxFar;
+    Camera parallaxNear;
 
     //targetting variables
     Vector3 target = new Vector3();
     Vector3 offset = new Vector3();
+    float orthoSize = 15;
     [HideInInspector]
     public bool targeted;
     [HideInInspector]
@@ -33,6 +37,8 @@ public class CameraController : MonoBehaviour {
         playerController = player.GetComponent<PlayerController>();
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
+        parallaxFar = GameObject.Find("ParallaxCam Far").GetComponent<Camera>();
+        parallaxNear = GameObject.Find("ParallaxCam Near").GetComponent<Camera>();
         ResetOffset();
         ResetTarget();
         target = playerTransform.position;
@@ -41,6 +47,12 @@ public class CameraController : MonoBehaviour {
 
     void Update()
     {
+        //lerp zoom
+        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, orthoSize, Time.deltaTime);
+        //make sure FoV matches zoom
+        parallaxFar.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 60) * Mathf.Rad2Deg) * 2f;
+        parallaxNear.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 60) * Mathf.Rad2Deg) * 2f;
+
         CameraMove();
         if (Input.GetMouseButtonDown(0))
         {
@@ -115,14 +127,14 @@ public class CameraController : MonoBehaviour {
         offset = standardOffset;
     }
 
-    public void SetOrthoSize(float size)
+    public void SetZoom(float size)
     {
-        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, size, Time.deltaTime);
+        orthoSize = size;
     }
 
-    public void ResetOrthoSize()
+    public void ResetZoom()
     {
-        mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, standardSize, Time.deltaTime * 30);
+        orthoSize = standardSize;
     }
 
     public IEnumerator ScreenShake(float strength, float duration)
