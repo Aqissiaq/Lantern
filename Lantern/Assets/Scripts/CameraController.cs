@@ -21,6 +21,9 @@ public class CameraController : MonoBehaviour {
     public bool targeted;
     [HideInInspector]
     public bool customOffset = false;
+    //bool to determine whether screenshake is on
+    [HideInInspector]
+    public bool isShaking;
     #endregion
 
 
@@ -41,7 +44,10 @@ public class CameraController : MonoBehaviour {
         CameraMove();
         if (Input.GetMouseButtonDown(0))
         {
-            StartCoroutine(ScreenShake(150, 1));
+            if (!isShaking)
+            {
+                StartCoroutine(ScreenShake(150, 1));
+            }
         }
         //debugging
         Debug.DrawRay(target + offset, Vector3.up, Color.red);
@@ -121,7 +127,7 @@ public class CameraController : MonoBehaviour {
 
     public IEnumerator ScreenShake(float strength, float duration)
     {
-        Debug.Log("shake started");
+        isShaking = true;
         //initiate perlin noise variables
         float perlinX = Random.Range(-100, 100);
         float perlinY = Random.Range(-100, 100);
@@ -144,6 +150,7 @@ public class CameraController : MonoBehaviour {
             //transform.position = Vector3.Lerp(target + offset, target + offset + translation, Time.deltaTime);
             yield return new WaitForSeconds(Time.deltaTime);
         }
+        isShaking = false;
         yield break;
         
     }

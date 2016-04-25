@@ -180,6 +180,16 @@
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\spine-unity\Editor\Resources\SpineAssetDatabaseMarker.txt" />
+    <None Include="Assets\spine-unity\Modules\CustomMaterials\readme.txt" />
+    <None Include="Assets\spine-unity\Modules\Ghost\Shaders\SkeletonGhost.shader" />
+    <None Include="Assets\spine-unity\Modules\SkeletonGraphic\Shaders\SkeletonGraphic.shader" />
+    <None Include="Assets\spine-unity\Shaders\Bones.shader" />
+    <None Include="Assets\spine-unity\Shaders\HiddenPass.shader" />
+    <None Include="Assets\spine-unity\Shaders\Skeleton.shader" />
+    <None Include="Assets\spine-unity\Shaders\SkeletonLit.shader" />
+    <None Include="Assets\spineData\spineData\girl_final.atlas.txt" />
+    <None Include="Assets\spineData\spineData\girl_final.json.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

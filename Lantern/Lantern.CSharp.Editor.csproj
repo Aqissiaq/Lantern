@@ -114,6 +114,28 @@
     <Compile Include="Assets\Editor\ImageEffects\SunShaftsEditor.cs" />
     <Compile Include="Assets\Editor\ImageEffects\TonemappingEditor.cs" />
     <Compile Include="Assets\Editor\ImageEffects\VignetteAndChromaticAberrationEditor.cs" />
+    <Compile Include="Assets\spine-unity\Asset Types\Editor\AtlasAssetInspector.cs" />
+    <Compile Include="Assets\spine-unity\Asset Types\Editor\SkeletonDataAssetInspector.cs" />
+    <Compile Include="Assets\spine-unity\Editor\AssetDatabaseAvailabilityDetector.cs" />
+    <Compile Include="Assets\spine-unity\Editor\BoneFollowerInspector.cs" />
+    <Compile Include="Assets\spine-unity\Editor\Menus.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SkeletonAnimationInspector.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SkeletonAnimatorInspector.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SkeletonBaker.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SkeletonRendererInspector.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SpineAttributeDrawers.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SpineEditorUtilities.cs" />
+    <Compile Include="Assets\spine-unity\Editor\SpineInspectorUtility.cs" />
+    <Compile Include="Assets\spine-unity\Modules\BoundingBoxFollower\Editor\BoundingBoxFollowerInspector.cs" />
+    <Compile Include="Assets\spine-unity\Modules\CustomMaterials\Editor\SkeletonRendererCustomMaterialsInspector.cs" />
+    <Compile Include="Assets\spine-unity\Modules\Ragdoll\Editor\SkeletonRagdoll2DInspector.cs" />
+    <Compile Include="Assets\spine-unity\Modules\Ragdoll\Editor\SkeletonRagdollInspector.cs" />
+    <Compile Include="Assets\spine-unity\Modules\SkeletonGraphic\Editor\SkeletonGraphicInspector.cs" />
+    <Compile Include="Assets\spine-unity\Modules\SkeletonRenderSeparator\Editor\SkeletonPartsRendererInspector.cs" />
+    <Compile Include="Assets\spine-unity\Modules\SkeletonRenderSeparator\Editor\SkeletonRenderSeparatorInspector.cs" />
+    <Compile Include="Assets\spine-unity\SkeletonUtility\Editor\SkeletonUtilityBoneInspector.cs" />
+    <Compile Include="Assets\spine-unity\SkeletonUtility\Editor\SkeletonUtilityInspector.cs" />
+    <Compile Include="Assets\spine-unity\SkeletonUtility\Editor\SkeletonUtilitySubmeshRendererInspector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
@@ -193,6 +215,16 @@
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\spine-unity\Editor\Resources\SpineAssetDatabaseMarker.txt" />
+    <None Include="Assets\spine-unity\Modules\CustomMaterials\readme.txt" />
+    <None Include="Assets\spine-unity\Modules\Ghost\Shaders\SkeletonGhost.shader" />
+    <None Include="Assets\spine-unity\Modules\SkeletonGraphic\Shaders\SkeletonGraphic.shader" />
+    <None Include="Assets\spine-unity\Shaders\Bones.shader" />
+    <None Include="Assets\spine-unity\Shaders\HiddenPass.shader" />
+    <None Include="Assets\spine-unity\Shaders\Skeleton.shader" />
+    <None Include="Assets\spine-unity\Shaders\SkeletonLit.shader" />
+    <None Include="Assets\spineData\spineData\girl_final.atlas.txt" />
+    <None Include="Assets\spineData\spineData\girl_final.json.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

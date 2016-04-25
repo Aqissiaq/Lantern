@@ -247,7 +247,7 @@ public class PlayerController : MonoBehaviour {
         //these values need to be updated to match the sprite
         //modified to work only on flat surfaces
         bool groundIsFlat = !(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2);
-        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1.5f, -groundNormal, 1.4f, groundCheck);
+        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1, -groundNormal, 3.1f, groundCheck);
         //Debug.Log("GroundIsFlat" + groundIsFlat);
         //Debug.Log(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)));
         return ground && groundIsFlat;
@@ -278,7 +278,8 @@ public class PlayerController : MonoBehaviour {
         ledgeCheckObject.transform.localScale = ledgeGrabRect.size;
 
         //return collision and destroy check-object
-        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.Raycast(transform.position, Vector3.right * Mathf.Sign(moveVector.x), 1.5f, groundCheck);
+        Debug.DrawLine(transform.position, transform.position + Vector3.right * Mathf.Sign(moveVector.x) * 2f, Color.black);
+        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.CircleCast(transform.position, 1.3f, Vector3.right * Mathf.Sign(moveVector.x), .7f, groundCheck);
         return onLedge;
     }
 
@@ -287,7 +288,35 @@ public class PlayerController : MonoBehaviour {
         return Physics2D.OverlapCircle(transform.position, 1.28f, groundCheck);
     }
 
-    //function to move player arbitrarily
+    //function to set animator parameters to int from enum
+    public int MoveStateToInt(MoveState state)
+    {
+        int o;
+        switch (state)
+        {
+            case MoveState.standing:
+                o = 0;
+                break;
+            case MoveState.walking:
+                o = 1;
+                break;
+            case MoveState.jumping:
+                o = 2;
+                break;
+            case MoveState.ledgegrab:
+                o = 3;
+                break;
+            case MoveState.falling:
+                o = 4;
+                break;
+            default:
+                o = 0;
+                break;
+        }
+        return o;
+    }
+
+    //function to move player arbitrarily (not used atm)
     public IEnumerator MovePlayer(Vector3 move, float timer)
     {
         rb.velocity = Vector3.zero;
