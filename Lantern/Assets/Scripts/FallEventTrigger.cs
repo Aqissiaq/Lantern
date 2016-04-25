@@ -10,7 +10,7 @@ public class FallEventTrigger : MonoBehaviour {
     Rigidbody2D playerRb;
     Collider2D col;
     //target of movement
-    Vector3 worldTargetPos = new Vector3(300, 25, 0);
+    Vector3 worldTargetPos = new Vector3(310, 25, 0);
 
 
     void Awake()
