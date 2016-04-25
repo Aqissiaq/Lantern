@@ -45,8 +45,8 @@ public class CameraController : MonoBehaviour {
         parallaxNear = GameObject.Find("ParallaxCam Near").GetComponent<Camera>();
         ResetOffset();
         ResetTarget();
-        target = playerTransform.position;
-        transform.position = target + offset;
+        target = new Vector3(23, 2.8f, 0);
+        transform.position = target;
     }
 
     void Update()
@@ -113,7 +113,7 @@ public class CameraController : MonoBehaviour {
         //adjust target to be same height above ground
         if (onGround)
         {
-            result = Vector3.Lerp(result, new Vector3(result.x, platformYPos + 8, result.z), Time.deltaTime * 30);
+            result = Vector3.Lerp(result, new Vector3(result.x, platformYPos + 8, result.z), Time.deltaTime * 10);
         }
 
         transform.position = Vector3.Lerp(transform.position, result, Time.deltaTime * 10);
