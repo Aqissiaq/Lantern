@@ -28,7 +28,9 @@ public class PlayerController : MonoBehaviour {
     public MoveState moveState;
     bool jumping;
     float jumpTimer;
-    RaycastHit2D groundSurface;
+    bool impulsed;
+    [HideInInspector]
+    public RaycastHit2D groundSurface;
     Vector2 groundNormal;
     bool debugging = true;
     bool checkState = true;
@@ -149,12 +151,19 @@ public class PlayerController : MonoBehaviour {
                 }
                 //set velocity of rigidbody
                 rb.velocity = moveVector;
+
+                //camerastuff
+                camController.PlatformSnap(groundSurface.point);
                 break;
 
             case MoveState.jumping:
-                Vector2 jumpVector = new Vector2(0, jumpStrength);
-                rb.AddForce(jumpVector, ForceMode2D.Impulse);
-                jumping = false;
+                if (!impulsed)
+                {
+                    Vector2 jumpVector = new Vector2(0, jumpStrength);
+                    rb.AddForce(jumpVector, ForceMode2D.Impulse);
+                    impulsed = true;
+                }
+                jumpTimer += Time.deltaTime;
                 break;
 
             case MoveState.ledgegrab:
@@ -188,11 +197,12 @@ public class PlayerController : MonoBehaviour {
                     checkState = true;
                     yClimbed = false;
                     xClimbed = false;
+                    camController.PlatformSnap(groundSurface.point);
                 }
                 break;
 
             case MoveState.falling:
-
+                camController.PlatformUnSnap();
                 break;
 
             default:
@@ -208,6 +218,13 @@ public class PlayerController : MonoBehaviour {
         groundNormal = Vector3.Lerp(groundNormal, groundSurface.normal, Time.deltaTime * 60);
 
         //get jump input
+        if (jumping == true && IsGrounded() && jumpTimer >= .1f)
+        {
+            jumping = false;
+            impulsed = false;
+            camController.PlatformSnap(groundSurface.point);
+        }
+
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             jumpTimer = 0;
@@ -235,7 +252,7 @@ public class PlayerController : MonoBehaviour {
         {
             moveState = MoveState.walking;
         }
-        else if (!IsGrounded())
+        else if (!IsGrounded() && rb.velocity.y <= 0)
         {
             moveState = MoveState.falling;
         }

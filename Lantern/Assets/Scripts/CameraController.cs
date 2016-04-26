@@ -6,6 +6,7 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
     #region variables
     //default values
+    [Header("Defaults")]
     public Vector3 standardOffset;
     public float standardSize = 15;
     //references
@@ -20,6 +21,7 @@ public class CameraController : MonoBehaviour {
     //targetting variables
     Vector3 target = new Vector3();
     Vector3 offset = new Vector3();
+    Vector3 result = new Vector3();
     float orthoSize = 15;
     [HideInInspector]
     public bool targeted;
@@ -28,6 +30,8 @@ public class CameraController : MonoBehaviour {
     //bool to determine whether screenshake is on
     [HideInInspector]
     public bool isShaking;
+    float platformYPos;
+    bool onGround = true;
     #endregion
 
 
@@ -41,8 +45,8 @@ public class CameraController : MonoBehaviour {
         parallaxNear = GameObject.Find("ParallaxCam Near").GetComponent<Camera>();
         ResetOffset();
         ResetTarget();
-        target = playerTransform.position;
-        transform.position = target + offset;
+        target = new Vector3(23, 2.8f, 0);
+        transform.position = target;
     }
 
     void Update()
@@ -50,8 +54,8 @@ public class CameraController : MonoBehaviour {
         //lerp zoom
         mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, orthoSize, Time.deltaTime);
         //make sure FoV matches zoom
-        parallaxFar.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 60) * Mathf.Rad2Deg) * 2f;
-        parallaxNear.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 60) * Mathf.Rad2Deg) * 2f;
+        parallaxFar.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 100) * Mathf.Rad2Deg) * 2f;
+        parallaxNear.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 100) * Mathf.Rad2Deg) * 2f;
 
         CameraMove();
         if (Input.GetMouseButtonDown(0))
@@ -62,10 +66,10 @@ public class CameraController : MonoBehaviour {
             }
         }
         //debugging
-        Debug.DrawRay(target + offset, Vector3.up, Color.red);
-        Debug.DrawRay(target + offset, Vector3.down, Color.red);
-        Debug.DrawRay(target + offset, Vector3.left, Color.red);
-        Debug.DrawRay(target + offset, Vector3.right, Color.red);
+        Debug.DrawRay(result, Vector3.up, Color.red);
+        Debug.DrawRay(result, Vector3.down, Color.red);
+        Debug.DrawRay(result, Vector3.left, Color.red);
+        Debug.DrawRay(result, Vector3.right, Color.red);
 
         Debug.DrawLine(playerTransform.position, playerTransform.position + offset, Color.white);
     }
@@ -82,10 +86,21 @@ public class CameraController : MonoBehaviour {
         //custom offsets
         if (!customOffset)
         {
-            float yOffset = playerController.moveState == PlayerController.MoveState.falling ? -standardOffset.y : standardOffset.y;
+            float yOffset = standardOffset.y;
+            if (!(Vector3.Distance(player.transform.position, playerController.groundSurface.point) <= 15))
+            {
+                yOffset = Mathf.Lerp(offset.y,
+                            playerController.moveState == PlayerController.MoveState.falling ? -standardOffset.y : standardOffset.y,
+                            Time.deltaTime * 10);
+            }
+
+
+            //change offset based on movement direction
             if (playerController.moveVector.x != 0)
             {
-                offset = Mathf.Sign(playerController.moveVector.x) == -1 ? new Vector3(-standardOffset.x, yOffset, 0) : new Vector3(standardOffset.x, yOffset, 0);
+                offset = Vector3.Lerp(offset,
+                                    Mathf.Sign(playerController.moveVector.x) == -1 ? new Vector3(-standardOffset.x, yOffset, 0) : new Vector3(standardOffset.x, yOffset, 0),
+                                    Time.deltaTime * 10);
             }
             else
             {
@@ -93,15 +108,29 @@ public class CameraController : MonoBehaviour {
             }
         }
 
+        result = target + offset;
 
-        //physics-smoothing
+        //adjust target to be same height above ground
+        if (onGround)
+        {
+            result = Vector3.Lerp(result, new Vector3(result.x, platformYPos + 8, result.z), Time.deltaTime * 10);
+        }
+
+        transform.position = Vector3.Lerp(transform.position, result, Time.deltaTime * 10);
+
+        /*//physics-smoothing (deprecated)
         //vector from camera to target
         Vector3 moveVector = (target + offset) - current;
         Vector3 moveDirection = moveVector.normalized;
-
         //add force
-        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 5, .1f) * Time.deltaTime * 60);
+        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 5, .1f) * Time.deltaTime * 60);*/
 
+    }
+
+    public bool InViewRect()
+    {
+        return true;
+        //mainCam.WorldToScreenPoint();
     }
 
     public void SetTarget(Vector3 newTarget)
@@ -117,7 +146,7 @@ public class CameraController : MonoBehaviour {
 
     public void SetOffset(Vector3 newOffset)
     {
-        //customOffset = true;
+        customOffset = true;
         offset = newOffset;
     }
 
@@ -137,6 +166,16 @@ public class CameraController : MonoBehaviour {
         orthoSize = standardSize;
     }
 
+    public void PlatformSnap(Vector3 groundPos)
+    {
+        onGround = true;
+        platformYPos = groundPos.y;
+    }
+
+    public void PlatformUnSnap()
+    {
+        onGround = false;
+    }
     public IEnumerator ScreenShake(float strength, float duration)
     {
         isShaking = true;

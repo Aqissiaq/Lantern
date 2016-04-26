@@ -40,8 +40,9 @@ public class FallEventTrigger : MonoBehaviour {
             camController.StartCoroutine(camController.ScreenShake(50, 2));
         }
         yield return new WaitForSeconds(3);
-        playerRb.AddForce((worldTargetPos - player.transform.position) * 70, ForceMode2D.Impulse);
+        playerRb.AddForce((worldTargetPos - player.transform.position) * 100, ForceMode2D.Impulse);
         playerController.enabled = false;
+        camController.PlatformUnSnap();
         yield return new WaitForSeconds(1.5f);
         playerController.enabled = true;
         yield break;
