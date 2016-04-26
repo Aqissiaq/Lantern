@@ -85,14 +85,14 @@ public class PlayerController : MonoBehaviour {
         }
 
         //set to kinematic to move player
-        if (moveState == MoveState.ledgegrab)
+        /*if (moveState == MoveState.ledgegrab)
         {
             rb.isKinematic = true;
         }
         else
         {
             rb.isKinematic = false;
-        }
+        }*/
 
         //debugging
         if (Input.GetKeyDown(KeyCode.R))
@@ -184,22 +184,21 @@ public class PlayerController : MonoBehaviour {
                 //climb down
                 if (!yClimbed || !xClimbed)
                 {
-                    if (Input.GetAxis("Horizontal") * Mathf.Sign(offset.x) < 0)
+                    Vector3 climbDown = new Vector3(-xClimb.x, .5f * -yClimb.y, 0);
+                    Debug.DrawRay(transform.position, climbDown, Color.gray);
+                    if (Input.GetAxis("Horizontal") * Mathf.Sign(offset.x) < 0 || Input.GetAxis("Vertical") < 0)
                     {
                         checkState = true;
-                        if (!CheckCollision(-xClimb))
+                        if (!CheckCollision(climbDown))
                         {
-                            rb.MovePosition(transform.position - xClimb * Time.deltaTime * 10);
+                            rb.isKinematic = false;
+                            rb.AddForce(climbDown * 100, ForceMode2D.Impulse);
+                            //rb.MovePosition(transform.position + climbDown * Time.deltaTime);
                         }
                     }
-
-                    if (Input.GetAxis("Vertical") < 0)
+                    else
                     {
-                        checkState = true;
-                        if (!CheckCollision(-yClimb))
-                        {
-                            rb.MovePosition(transform.position - yClimb * Time.deltaTime * 10);
-                        }
+                        rb.isKinematic = true;
                     }
                 }
 
@@ -220,6 +219,7 @@ public class PlayerController : MonoBehaviour {
                     checkState = true;
                     yClimbed = false;
                     xClimbed = false;
+                    rb.isKinematic = false;
                     camController.PlatformSnap(groundSurface.point);
                 }
                 break;
