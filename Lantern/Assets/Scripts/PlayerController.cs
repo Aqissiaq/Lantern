@@ -84,16 +84,6 @@ public class PlayerController : MonoBehaviour {
             CheckState();
         }
 
-        //set to kinematic to move player
-        /*if (moveState == MoveState.ledgegrab)
-        {
-            rb.isKinematic = true;
-        }
-        else
-        {
-            rb.isKinematic = false;
-        }*/
-
         //debugging
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -144,13 +134,8 @@ public class PlayerController : MonoBehaviour {
                 theta = moveVector.x < 0 ? (pi / 2) - theta : -((pi / 2) - theta);
                 moveVector = new Vector2(moveVector.x * Mathf.Cos(theta) - moveVector.y * Mathf.Sin(theta),
                     moveVector.x * Mathf.Sin(theta) + moveVector.y * Mathf.Cos(theta));
-                //preserve y-velocity if the ground is flat
-                if (!(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2))
-                {
-                    moveVector = new Vector2(moveVector.x, rb.velocity.y);
-                }
                 //set velocity of rigidbody
-                rb.velocity = moveVector;
+                rb.velocity = Vector2.Lerp(rb.velocity, moveVector * moveSpeed, Time.deltaTime);
 
                 //camerastuff
                 camController.PlatformSnap(groundSurface.point);
@@ -169,15 +154,16 @@ public class PlayerController : MonoBehaviour {
             case MoveState.ledgegrab:
                 CheckLedge();
                 checkState = false;
-                Vector3 xClimb = new Vector3(climbDestination.x, transform.position.y, 0) - transform.position;
+                //split climb into vertical and horizontal components
                 Vector3 yClimb = new Vector3(transform.position.x, climbDestination.y, 0) - transform.position;
+                Vector3 xClimb = new Vector3(climbDestination.x, transform.position.y, 0) - transform.position;
                 //check if vertical climbed
-                if (Mathf.Abs(transform.position.y - climbDestination.y) <= .1f)
+                if (Mathf.Abs(transform.position.y - climbDestination.y) <= .05f)
                 {
                     yClimbed = true;
                 }
                 //check if horizontal climbed
-                if (Mathf.Abs(transform.position.x - climbDestination.x) <= .1f)
+                if (Mathf.Abs(transform.position.x - climbDestination.x) <= .05f)
                 {
                     xClimbed = true;
                 }
@@ -193,7 +179,6 @@ public class PlayerController : MonoBehaviour {
                         {
                             rb.isKinematic = false;
                             rb.AddForce(climbDown * 100, ForceMode2D.Impulse);
-                            //rb.MovePosition(transform.position + climbDown * Time.deltaTime);
                         }
                     }
                     else
@@ -254,6 +239,11 @@ public class PlayerController : MonoBehaviour {
             jumping = true;
         }
 
+        if (jumpTimer >= 2)
+        {
+            jumping = false;
+        }
+
         //ledgecheck
         bool onLedge = CheckLedge();
 
@@ -287,7 +277,7 @@ public class PlayerController : MonoBehaviour {
         //these values need to be updated to match the sprite
         //modified to work only on flat surfaces
         bool groundIsFlat = !(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2);
-        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1, -groundNormal, 3.1f, groundCheck);
+        RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1.3f, -groundNormal, 2.8f, groundCheck);
         //Debug.Log("GroundIsFlat" + groundIsFlat);
         //Debug.Log(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)));
         return ground && groundIsFlat;
