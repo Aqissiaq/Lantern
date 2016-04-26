@@ -17,6 +17,10 @@ public class CameraTrigger : MonoBehaviour {
     public bool setZoom;
     public float size;
     public bool resetZoom;
+    [Header("Lerping")]
+    public bool setLerpSpeed;
+    public float lerpSpeed;
+    public bool resetLerpSpeed;
 
     GameObject mainCam;
     GameObject player;
@@ -49,6 +53,11 @@ public class CameraTrigger : MonoBehaviour {
             {
                 camController.SetZoom(size);
             }
+            //set lerp speed
+            if (setLerpSpeed)
+            {
+                camController.SetLerpSpeed(lerpSpeed);
+            }
         }
     }
 
@@ -68,6 +77,10 @@ public class CameraTrigger : MonoBehaviour {
             if (resetZoom)
             {
                 camController.ResetZoom();
+            }
+            if (resetLerpSpeed)
+            {
+                camController.ResetLerpSpeed();
             }
         }
     }

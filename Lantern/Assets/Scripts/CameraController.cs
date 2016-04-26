@@ -2,7 +2,6 @@
 using System.Collections;
 
 [RequireComponent(typeof(Camera))]
-[ExecuteInEditMode]
 public class CameraController : MonoBehaviour {
     #region variables
     //default values
@@ -10,7 +9,7 @@ public class CameraController : MonoBehaviour {
     public Vector3 standardOffset;
     public float standardSize = 15;
     //references
-    public GameObject player;
+    GameObject player;
     PlayerController playerController;
     Transform playerTransform;
     Rigidbody2D rb;
@@ -32,11 +31,14 @@ public class CameraController : MonoBehaviour {
     public bool isShaking;
     float platformYPos;
     bool onGround = true;
+    public float lerpSpeed;
+    float standardLerpSpeed = 10;
     #endregion
 
 
     void Awake()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         playerTransform = player.GetComponent<Transform>();
         playerController = player.GetComponent<PlayerController>();
         rb = gameObject.GetComponent<Rigidbody2D>();
@@ -45,6 +47,7 @@ public class CameraController : MonoBehaviour {
         parallaxNear = GameObject.Find("ParallaxCam Near").GetComponent<Camera>();
         ResetOffset();
         ResetTarget();
+        ResetLerpSpeed();
         target = new Vector3(23, 2.8f, 0);
         transform.position = target;
     }
@@ -58,13 +61,7 @@ public class CameraController : MonoBehaviour {
         parallaxNear.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 100) * Mathf.Rad2Deg) * 2f;
 
         CameraMove();
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (!isShaking)
-            {
-                StartCoroutine(ScreenShake(150, 1));
-            }
-        }
+
         //debugging
         Debug.DrawRay(result, Vector3.up, Color.red);
         Debug.DrawRay(result, Vector3.down, Color.red);
@@ -116,15 +113,7 @@ public class CameraController : MonoBehaviour {
             result = Vector3.Lerp(result, new Vector3(result.x, platformYPos + 8, result.z), Time.deltaTime * 10);
         }
 
-        transform.position = Vector3.Lerp(transform.position, result, Time.deltaTime * 10);
-
-        /*//physics-smoothing (deprecated)
-        //vector from camera to target
-        Vector3 moveVector = (target + offset) - current;
-        Vector3 moveDirection = moveVector.normalized;
-        //add force
-        rb.AddForce(moveDirection * Mathf.Max(moveVector.magnitude * 5, .1f) * Time.deltaTime * 60);*/
-
+        transform.position = Vector3.Lerp(transform.position, result, Time.deltaTime * lerpSpeed);
     }
 
     public bool InViewRect()
@@ -176,6 +165,17 @@ public class CameraController : MonoBehaviour {
     {
         onGround = false;
     }
+
+    public void SetLerpSpeed(float newSpeed)
+    {
+        lerpSpeed = newSpeed;
+    }
+
+    public void ResetLerpSpeed()
+    {
+        lerpSpeed = standardLerpSpeed;
+    }
+
     public IEnumerator ScreenShake(float strength, float duration)
     {
         isShaking = true;
