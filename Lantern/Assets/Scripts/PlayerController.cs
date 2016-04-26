@@ -181,11 +181,34 @@ public class PlayerController : MonoBehaviour {
                 {
                     xClimbed = true;
                 }
+                //climb down
+                if (!yClimbed || !xClimbed)
+                {
+                    if (Input.GetAxis("Horizontal") * Mathf.Sign(offset.x) < 0)
+                    {
+                        checkState = true;
+                        if (!CheckCollision(-xClimb))
+                        {
+                            rb.MovePosition(transform.position - xClimb * Time.deltaTime * 10);
+                        }
+                    }
+
+                    if (Input.GetAxis("Vertical") < 0)
+                    {
+                        checkState = true;
+                        if (!CheckCollision(-yClimb))
+                        {
+                            rb.MovePosition(transform.position - yClimb * Time.deltaTime * 10);
+                        }
+                    }
+                }
+
                 //climb vertically
                 if (!yClimbed && Input.GetAxis("Vertical") > 0)
                 {
                     rb.MovePosition(transform.position + yClimb * Time.deltaTime * 10);
                 }
+
                 //then horizontally
                 if (yClimbed && !xClimbed && Input.GetAxis("Horizontal") * Mathf.Sign(offset.x) > 0)
                 {
