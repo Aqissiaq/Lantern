@@ -39,8 +39,7 @@ public class CameraController : MonoBehaviour {
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        playerTransform = player.GetComponent<Transform>();
-        playerController = player.GetComponent<PlayerController>();
+
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
         parallaxFar = GameObject.Find("ParallaxCam Far").GetComponent<Camera>();
@@ -51,6 +50,12 @@ public class CameraController : MonoBehaviour {
         target = new Vector3(23, 2.8f, 0);
         transform.position = target;
     }
+
+	void Start()
+	{
+		playerTransform = player.GetComponent<Transform>();
+		playerController = player.GetComponent<PlayerController>();
+	}
 
     void Update()
     {

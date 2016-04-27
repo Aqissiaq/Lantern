@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour {
     float jumpTimer;
     bool impulsed;
     [HideInInspector]
-    public RaycastHit2D groundSurface;
+	public RaycastHit2D groundSurface;
     Vector2 groundNormal;
     bool debugging = true;
     bool checkState = true;
