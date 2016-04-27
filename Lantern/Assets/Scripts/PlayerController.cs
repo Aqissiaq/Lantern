@@ -319,10 +319,10 @@ public class PlayerController : MonoBehaviour {
     }
 
     //function to set animator parameters to int from enum
-    public int MoveStateToInt(MoveState state)
+    public int MoveStateToInt()
     {
         int o;
-        switch (state)
+		switch (moveState)
         {
             case MoveState.standing:
                 o = 0;
