@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\PlayerController(old).cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
+    <Compile Include="Assets\Scripts\RollingFog.cs" />
     <Compile Include="Assets\spine-csharp\Animation.cs" />
     <Compile Include="Assets\spine-csharp\AnimationState.cs" />
     <Compile Include="Assets\spine-csharp\AnimationStateData.cs" />
