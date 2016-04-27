@@ -7,6 +7,7 @@ public class ButtonFunctions : MonoBehaviour {
     Canvas mainMenu;
     Canvas optionsMenu;
     Camera mainCam;
+    LevelLoaderScript levelLoader;
 
     void Awake()
     {
@@ -14,11 +15,12 @@ public class ButtonFunctions : MonoBehaviour {
         mainMenu = GameObject.FindGameObjectWithTag("MainMenu").GetComponent<Canvas>();
         optionsMenu = GameObject.FindGameObjectWithTag("OptionsMenu").GetComponent<Canvas>();
         mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        levelLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<LevelLoaderScript>();
     }
 
     public void StartGame()
     {
-        SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+        levelLoader.StartCoroutine(levelLoader.LoadScene(1));
     }
 
     public void GotoOptions()
@@ -31,10 +33,6 @@ public class ButtonFunctions : MonoBehaviour {
     {
         mainMenu.enabled = true;
         optionsMenu.enabled = false;
-        if (SceneManager.GetActiveScene().name != "MainMenu")
-        {
-            SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
-        }
     }
 
     public void ChangeVolume(float input)

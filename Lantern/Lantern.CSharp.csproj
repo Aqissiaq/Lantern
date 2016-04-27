@@ -70,12 +70,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AnimationController.cs" />
+    <Compile Include="Assets\Scripts\AnimationScript.cs" />
     <Compile Include="Assets\Scripts\AudioPlayer.cs" />
     <Compile Include="Assets\Scripts\BackgroundMove.cs" />
     <Compile Include="Assets\Scripts\ButtonFunctions.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\CameraTrigger.cs" />
+    <Compile Include="Assets\Scripts\Fader.cs" />
     <Compile Include="Assets\Scripts\FallEventTrigger.cs" />
+    <Compile Include="Assets\Scripts\LevelLoaderScript.cs" />
+    <Compile Include="Assets\Scripts\NextLevelScript.cs" />
     <Compile Include="Assets\Scripts\OptionsMenu.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\PlayerController(old).cs" />
@@ -158,6 +162,7 @@
     <Compile Include="Assets\spine-unity\SpineAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Environment art\Shaders and stuff\FogShader.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

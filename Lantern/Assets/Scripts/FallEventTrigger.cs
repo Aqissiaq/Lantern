@@ -41,7 +41,7 @@ public class FallEventTrigger : MonoBehaviour {
         }
         playerController.enabled = false;
         yield return new WaitForSeconds(3);
-        if ((player.transform.position.y <= worldTargetPos.y + 10))
+        if ((player.transform.position.y >= worldTargetPos.y - 10))
         {
             playerRb.AddForce((worldTargetPos - player.transform.position) * 100, ForceMode2D.Impulse);
         }
