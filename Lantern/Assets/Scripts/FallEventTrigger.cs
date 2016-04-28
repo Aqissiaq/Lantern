@@ -10,7 +10,7 @@ public class FallEventTrigger : MonoBehaviour {
     Rigidbody2D playerRb;
     Collider2D col;
     //target of movement
-    Vector3 worldTargetPos = new Vector3(300, 22, 0);
+    Vector3 worldTargetPos = new Vector3(300, 20, 0);
 
 
     void Awake()
@@ -44,6 +44,7 @@ public class FallEventTrigger : MonoBehaviour {
         if ((player.transform.position.y >= worldTargetPos.y - 10))
         {
             playerRb.AddForce((worldTargetPos - player.transform.position) * 100, ForceMode2D.Impulse);
+            playerController.moveState = PlayerController.MoveState.falling;
         }
         camController.PlatformUnSnap();
         yield return new WaitForSeconds(1.5f);

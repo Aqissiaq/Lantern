@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour {
     [Header("Defaults")]
     public Vector3 standardOffset;
     public float standardSize = 15;
+    public float standardLerpSpeed = 1;
     //references
     GameObject player;
     PlayerController playerController;
@@ -20,7 +21,7 @@ public class CameraController : MonoBehaviour {
     //targetting variables
     Vector3 target = new Vector3();
     Vector3 offset = new Vector3();
-    Vector3 result = new Vector3();
+    Vector3 result = new Vector3(22, 3.8f, 0);
     float orthoSize = 15;
     [HideInInspector]
     public bool targeted;
@@ -30,34 +31,34 @@ public class CameraController : MonoBehaviour {
     [HideInInspector]
     public bool isShaking;
     float platformYPos;
-    bool onGround = true;
-    public float lerpSpeed;
-    float standardLerpSpeed = 10;
+    public bool onGround = true;
+    float lerpSpeed;
     #endregion
 
 
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
         parallaxFar = GameObject.Find("ParallaxCam Far").GetComponent<Camera>();
         parallaxNear = GameObject.Find("ParallaxCam Near").GetComponent<Camera>();
-        ResetOffset();
-        ResetTarget();
-        ResetLerpSpeed();
-        target = new Vector3(23, 2.8f, 0);
-        transform.position = target;
     }
+
 
     void Start()
     {
         playerTransform = player.GetComponent<Transform>();
         playerController = player.GetComponent<PlayerController>();
+        ResetOffset();
+        ResetTarget();
+        ResetLerpSpeed();
+        transform.position = new Vector3(22, 2.8f, 0);
     }
+
 
     void Update()
     {
+
         //lerp zoom
         mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, orthoSize, Time.deltaTime);
         //make sure FoV matches zoom
@@ -77,7 +78,6 @@ public class CameraController : MonoBehaviour {
 
     void CameraMove()
     {
-        Vector3 current = transform.position;
         //targetting
         if (!targeted)
         {
@@ -109,22 +109,20 @@ public class CameraController : MonoBehaviour {
             }
         }
 
-        result = target + offset;
+        result = Vector3.MoveTowards(result, target + offset, lerpSpeed);
 
         //adjust target to be same height above ground
         if (onGround)
         {
-            result = Vector3.Lerp(result, new Vector3(result.x, platformYPos + 8, result.z), Time.deltaTime * 10);
+            result = Vector3.MoveTowards(result, new Vector3(result.x, platformYPos + 8, result.z), lerpSpeed / 10);
         }
 
-        transform.position = Vector3.Lerp(transform.position, result, Time.deltaTime * lerpSpeed);
+        //move camera
+        transform.position = result;
+            //Vector3.MoveTowards(transform.position, result, lerpSpeed);
+
     }
 
-    public bool InViewRect()
-    {
-        return true;
-        //mainCam.WorldToScreenPoint();
-    }
 
     public void SetTarget(Vector3 newTarget)
     {
@@ -207,6 +205,11 @@ public class CameraController : MonoBehaviour {
         }
         isShaking = false;
         yield break;
-        
+    }
+
+    //stupid
+    void OnLevelWasLoaded(int level)
+    {
+        transform.position = new Vector3(22, 3.8f, 0);
     }
 }
