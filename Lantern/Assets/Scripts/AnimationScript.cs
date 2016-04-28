@@ -7,7 +7,7 @@ public class AnimationScript : MonoBehaviour {
 	PlayerController playerController;
 
 	void Start () {
-		animator = GetComponent<Animator> ();
+		animator = GetComponentInChildren<Animator> ();
 		playerController = GetComponent<PlayerController> ();
 	}
 

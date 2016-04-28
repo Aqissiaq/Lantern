@@ -15,7 +15,7 @@ public class ButtonFunctions : MonoBehaviour {
         mainMenu = GameObject.FindGameObjectWithTag("MainMenu").GetComponent<Canvas>();
         optionsMenu = GameObject.FindGameObjectWithTag("OptionsMenu").GetComponent<Canvas>();
         mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        levelLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<LevelLoaderScript>();
+     //   levelLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<LevelLoaderScript>();
     }
 
     public void StartGame()

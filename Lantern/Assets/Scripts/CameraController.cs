@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour {
     public Vector3 standardOffset;
     public float standardSize = 15;
     //references
-    GameObject player;
+    public GameObject player;
     PlayerController playerController;
     Transform playerTransform;
     Rigidbody2D rb;
@@ -38,7 +38,7 @@ public class CameraController : MonoBehaviour {
 
     void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+		player = GameObject.FindGameObjectWithTag("TruePlayer");
         rb = gameObject.GetComponent<Rigidbody2D>();
         mainCam = GetComponentInChildren<Camera>();
         parallaxFar = GameObject.Find("ParallaxCam Far").GetComponent<Camera>();
