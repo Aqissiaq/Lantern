@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour {
     float jumpTimer;
     bool impulsed;
     [HideInInspector]
-    public RaycastHit2D groundSurface;
+	public RaycastHit2D groundSurface;
     Vector2 groundNormal;
     bool debugging = true;
     bool checkState = true;
@@ -319,10 +319,10 @@ public class PlayerController : MonoBehaviour {
     }
 
     //function to set animator parameters to int from enum
-    public int MoveStateToInt(MoveState state)
+    public int MoveStateToInt()
     {
         int o;
-        switch (state)
+		switch (moveState)
         {
             case MoveState.standing:
                 o = 0;
