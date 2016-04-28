@@ -75,8 +75,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\AnimationController.cs" />
-    <Compile Include="Assets\Scripts\AnimationScript.cs" />
+    <Compile Include="Assets\GirlAudioScript.cs" />
+    <Compile Include="Assets\Scripts\AnimationController.cs" />
     <Compile Include="Assets\Scripts\AudioPlayer.cs" />
     <Compile Include="Assets\Scripts\BackgroundMove.cs" />
     <Compile Include="Assets\Scripts\ButtonFunctions.cs" />

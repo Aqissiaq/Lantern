@@ -38,12 +38,9 @@ public class CameraController : MonoBehaviour {
 
     void Awake()
     {
-<<<<<<< HEAD
 		player = GameObject.FindGameObjectWithTag("TruePlayer");
         rb = gameObject.GetComponent<Rigidbody2D>();
-=======
         player = GameObject.FindGameObjectWithTag("Player");
->>>>>>> 5d2c168193fa5147337b1217956d09f29301b541
         mainCam = GetComponentInChildren<Camera>();
         parallaxFar = GameObject.Find("ParallaxCam Far").GetComponent<Camera>();
         parallaxNear = GameObject.Find("ParallaxCam Near").GetComponent<Camera>();

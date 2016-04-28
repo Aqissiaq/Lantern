@@ -48,7 +48,7 @@ public class FallEventTrigger : MonoBehaviour {
         }
         camController.PlatformUnSnap();
         yield return new WaitForSeconds(1.5f);
-        playerController.enabled = true;
+        //playerController.enabled = true;
         yield break;
     }
 }
