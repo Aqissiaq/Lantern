@@ -18,6 +18,14 @@ public class ButtonFunctions : MonoBehaviour {
      //   levelLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<LevelLoaderScript>();
     }
 
+    void Update()
+    {
+        if (levelLoader == null)
+        {
+            levelLoader = GameObject.FindGameObjectWithTag("GameController").GetComponent<LevelLoaderScript>();
+        }
+    }
+
     public void StartGame()
     {
         levelLoader.StartCoroutine(levelLoader.LoadScene(1));

@@ -19,7 +19,7 @@ public class LevelLoaderScript : MonoBehaviour
     public IEnumerator LoadScene(int scene)
     {
         fader.BeginFade(1);
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(.5f);
         SceneManager.LoadScene(scene);
     }
 

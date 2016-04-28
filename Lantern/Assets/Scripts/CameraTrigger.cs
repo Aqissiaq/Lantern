@@ -29,15 +29,20 @@ public class CameraTrigger : MonoBehaviour {
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        mainCam = GameObject.Find("Camera container");
+        mainCam = GameObject.FindGameObjectWithTag("CameraContainer");
         camController = mainCam.GetComponent<CameraController>();
     }
 
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Player")
+        if (other.tag == "CameraContainer")
         {
+            //set lerp speed
+            if (setLerpSpeed)
+            {
+                camController.SetLerpSpeed(lerpSpeed);
+            }
             //set offset
             if (setOffset)
             {
@@ -53,11 +58,6 @@ public class CameraTrigger : MonoBehaviour {
             {
                 camController.SetZoom(size);
             }
-            //set lerp speed
-            if (setLerpSpeed)
-            {
-                camController.SetLerpSpeed(lerpSpeed);
-            }
         }
     }
 
@@ -65,6 +65,10 @@ public class CameraTrigger : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
+            if (resetLerpSpeed)
+            {
+                camController.ResetLerpSpeed();
+            }
             if (resetOffset)
             {
                 camController.ResetOffset();
@@ -77,10 +81,6 @@ public class CameraTrigger : MonoBehaviour {
             if (resetZoom)
             {
                 camController.ResetZoom();
-            }
-            if (resetLerpSpeed)
-            {
-                camController.ResetLerpSpeed();
             }
         }
     }

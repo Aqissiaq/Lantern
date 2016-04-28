@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
 
     //references
     CameraController camController;
+    Collider2D camCollider;
     Collider2D col;
     GameObject ledgeCheckObject;
     Collider2D ledgeCheck;
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour {
     {
         rb = GetComponent<Rigidbody2D>();
         camController = GameObject.Find("Camera container").GetComponent<CameraController>();
+        camCollider = GameObject.Find("Camera container").GetComponent<Collider2D>();
         col = GetComponent<Collider2D>();
 
         ledgeCheckObject = GameObject.Instantiate(ledgeCheckCollider);
@@ -63,6 +65,7 @@ public class PlayerController : MonoBehaviour {
     void Start()
     {
         Physics2D.IgnoreCollision(col, ledgeCheck);
+        Physics2D.IgnoreCollision(col, camCollider);
     }
 
     void Update()
@@ -135,9 +138,13 @@ public class PlayerController : MonoBehaviour {
                 moveVector = new Vector2(moveVector.x * Mathf.Cos(theta) - moveVector.y * Mathf.Sin(theta),
                     moveVector.x * Mathf.Sin(theta) + moveVector.y * Mathf.Cos(theta));
                 //set velocity of rigidbody
-                rb.velocity = Vector2.Lerp(rb.velocity, moveVector * moveSpeed, Time.deltaTime);
+                rb.velocity = Vector2.Lerp(rb.velocity, moveVector * moveSpeed, Mathf.SmoothStep(0, 1, Time.deltaTime * 30));
 
                 //camerastuff
+                if (Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2)
+                {
+
+                }
                 camController.PlatformSnap(groundSurface.point);
                 break;
 
@@ -250,7 +257,7 @@ public class PlayerController : MonoBehaviour {
         //determine movestate
         if (onLedge)
         {
-            climbDestination = transform.position + offset + new Vector3(0, 1.26f, 0);
+            climbDestination = transform.position + offset + new Vector3(0, 1f, 0);
             moveState = MoveState.ledgegrab;
         }
         else if (jumping)
@@ -278,8 +285,6 @@ public class PlayerController : MonoBehaviour {
         //modified to work only on flat surfaces
         bool groundIsFlat = !(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)) <= sqr2 / 2);
         RaycastHit2D ground =  Physics2D.CircleCast(transform.position, 1.3f, -groundNormal, 2.8f, groundCheck);
-        //Debug.Log("GroundIsFlat" + groundIsFlat);
-        //Debug.Log(Mathf.Abs(Vector3.Dot(groundNormal.normalized, Vector3.up)));
         return ground && groundIsFlat;
     }
 
@@ -307,9 +312,9 @@ public class PlayerController : MonoBehaviour {
         ledgeCheckObject.transform.position = ledgeGrabRect.position;
         ledgeCheckObject.transform.localScale = ledgeGrabRect.size;
 
-        //return collision and destroy check-object
+        //return collision
         Debug.DrawLine(transform.position, transform.position + Vector3.right * Mathf.Sign(moveVector.x) * 2f, Color.black);
-        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.CircleCast(transform.position, 1.3f, Vector3.right * Mathf.Sign(moveVector.x), .7f, groundCheck);
+        onLedge = !ledgeCheck.IsTouchingLayers(groundCheck) && Physics2D.CircleCast(transform.position, .9f, Vector3.right * Mathf.Sign(moveVector.x), .6f, groundCheck);
         return onLedge;
     }
 
