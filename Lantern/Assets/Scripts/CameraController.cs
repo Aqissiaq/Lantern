@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour {
     public float standardSize = 15;
     public float standardLerpSpeed = 1;
     //references
-    public GameObject player;
+    GameObject player;
     PlayerController playerController;
     Transform playerTransform;
     Rigidbody2D rb;
@@ -64,8 +64,8 @@ public class CameraController : MonoBehaviour {
         //lerp zoom
         mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, orthoSize, Time.deltaTime);
         //make sure FoV matches zoom
-        parallaxFar.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 100) * Mathf.Rad2Deg) * 2f;
-        parallaxNear.fieldOfView = (Mathf.Atan(mainCam.orthographicSize / 100) * Mathf.Rad2Deg) * 2f;
+        parallaxFar.fieldOfView = Mathf.Atan(mainCam.orthographicSize / 10) * Mathf.Rad2Deg;
+        parallaxNear.fieldOfView = Mathf.Atan(mainCam.orthographicSize / 10) * Mathf.Rad2Deg * 2f;
 
         CameraMove();
 

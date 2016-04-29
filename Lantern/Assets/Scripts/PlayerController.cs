@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
     public float moveSpeed;
     public float jumpStrength;
     public float maxJumpTime;
+    [Range(0, 100)]
+    public float friction;
 
     //checking values (customizable)
     [Header("Check Values")]
@@ -126,7 +128,7 @@ public class PlayerController : MonoBehaviour {
                 //align with surface?
                 //probably set an idle animation
 
-                rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime);
+                rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime * friction);
                 break;
 
             case MoveState.walking:

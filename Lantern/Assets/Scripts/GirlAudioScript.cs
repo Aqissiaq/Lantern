@@ -13,7 +13,7 @@ public class GirlAudioScript : MonoBehaviour {
     public List<AudioClip> caveWalking = new List<AudioClip>();
 
     //variables
-    SurfaceType walkingSurface;
+    public SurfaceType walkingSurface;
     int soundSelector = 0;
 
     public enum SurfaceType

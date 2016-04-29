@@ -8,6 +8,7 @@ public class AnimationController : MonoBehaviour {
     PlayerController playerController;
     GirlAudioScript girlAudio;
     GameObject girl;
+    Rigidbody2D playerRb;
     SkeletonAnimation skeletonAnimation;
     Spine.SkeletonData skeletonData;
     Spine.Skeleton skeleton;
@@ -27,6 +28,7 @@ public class AnimationController : MonoBehaviour {
     void Awake()
     {
         playerController = GetComponent<PlayerController>();
+        playerRb = GetComponent<Rigidbody2D>();
         girlAudio = GetComponent<GirlAudioScript>();
         girl = GameObject.Find("Girl");
         skeletonAnimation = GetComponentInChildren<SkeletonAnimation>();
@@ -70,11 +72,13 @@ public class AnimationController : MonoBehaviour {
         switch (playerController.moveState)
         {
             case PlayerController.MoveState.standing:
+                skeletonAnimation.loop = true;
                 skeletonAnimation.timeScale = 1;
                 skeletonAnimation.AnimationName = "idle";
                 break;
             case PlayerController.MoveState.walking:
-                skeletonAnimation.timeScale = 1;
+                skeletonAnimation.loop = true;
+                skeletonAnimation.timeScale = playerRb.velocity.magnitude * .07f;
                 skeletonAnimation.AnimationName = "run";
                 SoundFX();
                 break;
@@ -91,6 +95,9 @@ public class AnimationController : MonoBehaviour {
                 skeletonAnimation.AnimationName = "jump";
                 break;
             default:
+                skeletonAnimation.loop = true;
+                skeletonAnimation.timeScale = 1;
+                skeletonAnimation.AnimationName = "idle";
                 break;
         }
     }
