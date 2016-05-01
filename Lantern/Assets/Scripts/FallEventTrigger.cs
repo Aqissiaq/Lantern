@@ -3,12 +3,15 @@ using System.Collections;
 
 public class FallEventTrigger : MonoBehaviour {
 
+    //audio
+    public AudioClip rumbleSound;
     //references
     CameraController camController;
     PlayerController playerController;
     GameObject player;
     Rigidbody2D playerRb;
     Collider2D col;
+    AudioSource audioPlayer;
     //target of movement
     Vector3 worldTargetPos = new Vector3(300, 20, 0);
 
@@ -20,6 +23,7 @@ public class FallEventTrigger : MonoBehaviour {
         player = GameObject.FindGameObjectWithTag("Player");
         playerController = player.GetComponent<PlayerController>();
         playerRb = player.GetComponent<Rigidbody2D>();
+        audioPlayer = GetComponent<AudioSource>();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -37,6 +41,12 @@ public class FallEventTrigger : MonoBehaviour {
         if (!camController.isShaking)
         {
             camController.StartCoroutine(camController.ScreenShake(50, 2));
+        }
+        if (!audioPlayer.isPlaying)
+        {
+            audioPlayer.clip = rumbleSound;
+            audioPlayer.loop = true;
+            audioPlayer.Play();
         }
         playerController.enabled = false;
         yield return new WaitForSeconds(3);

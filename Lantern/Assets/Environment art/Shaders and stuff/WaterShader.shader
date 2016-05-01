@@ -1,5 +1,4 @@
-﻿
-Shader "Custom/WaterShader"
+﻿Shader "Custom/WaterShader"
 {
 	Properties
 	{
@@ -8,14 +7,14 @@ Shader "Custom/WaterShader"
 
 		_BumpMap("Noise text", 2D) = "bump" {}
 	_Magnitude("Magnitude", Range(0,1)) = 0.05
-		_waterPeriod("Water Period", Float) = 1
-
+		_waterMagnitude("Water magnitude", Float) = 1
+		_waterPeriod("Water period", Float) = 1
 	}
 
 		SubShader
 	{
-		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
-		ZWrite On Lighting Off Cull Off Fog{ Mode Off } Blend One Zero
+		Tags{ "Queue" = "AlphaTest" "IgnoreProjector" = "False" }
+		ZWrite Off Lighting Off Cull Off Fog{ Mode Off } Blend One OneMinusSrcAlpha
 
 		GrabPass{ "_GrabTexture" }
 
@@ -30,10 +29,11 @@ Shader "Custom/WaterShader"
 
 	sampler2D _MainTex;
 	fixed4 _Colour;
+	float _waterMagnitude;
+	float _waterPeriod;
 
 	sampler2D _BumpMap;
 	float  _Magnitude;
-	float _waterPeriod;
 
 	struct vin_vct
 	{
@@ -71,8 +71,7 @@ Shader "Custom/WaterShader"
 	}
 
 	// Fragment function
-	half4 frag(v2f_vct i) : COLOR
-	{
+	fixed4 frag(v2f_vct i) : COLOR{
 		fixed4 noise = tex2D(_BumpMap, i.texcoord);
 	fixed4 mainColour = tex2D(_MainTex, i.texcoord);
 
@@ -82,14 +81,15 @@ Shader "Custom/WaterShader"
 		sinusoid
 		(
 			float2 (time, time) + (noise.xy),
-			float2(-_Magnitude, -_Magnitude),
-			float2(+_Magnitude, +_Magnitude),
+			float2(-_waterMagnitude, -_waterMagnitude),
+			float2(+_waterMagnitude, +_waterMagnitude),
 			float2(_waterPeriod, _waterPeriod)
 			);
 
-	i.grabUV.xy += waterDisplacement;
-	fixed4 col = tex2Dproj(_GrabTexture, UNITY_PROJ_COORD(i.grabUV));
-	return col * mainColour;
+	i.uvgrab.xy += waterDisplacement;
+	fixed4 col = tex2Dproj(_GrabTexture, UNITY_PROJ_COORD(i.uvgrab));
+	
+    return col * mainColour;
 	}
 
 		ENDCG

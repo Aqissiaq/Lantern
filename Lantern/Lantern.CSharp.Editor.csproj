@@ -138,6 +138,7 @@
     <Compile Include="Assets\spine-unity\SkeletonUtility\Editor\SkeletonUtilitySubmeshRendererInspector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Environment art\Shaders and stuff\DarknessShader.shader" />
     <None Include="Assets\Environment art\Shaders and stuff\FogShader.shader" />
     <None Include="Assets\Environment art\Shaders and stuff\WaterShader.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
@@ -227,6 +228,7 @@
     <None Include="Assets\spine-unity\Shaders\SkeletonLit.shader" />
     <None Include="Assets\spineData\spineData\girl_final.atlas.txt" />
     <None Include="Assets\spineData\spineData\girl_final.json.txt" />
+    <None Include="Assets\texture\smoke\SmokeShader.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

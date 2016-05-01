@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour {
     Rigidbody2D rb;
 
     public MoveState moveState;
+    [HideInInspector]
+    public bool fallen;
+    [HideInInspector]
+    public float getUpProgress;
     bool jumping;
     float jumpTimer;
     bool impulsed;
@@ -50,7 +54,7 @@ public class PlayerController : MonoBehaviour {
 
     public enum MoveState
     {
-        standing, walking, jumping, ledgegrab, falling
+        standing, walking, jumping, ledgegrab, falling, getup
     }
 
     void Awake()
@@ -124,8 +128,20 @@ public class PlayerController : MonoBehaviour {
     {
         switch (moveState)
         {
+            case MoveState.getup:
+                checkState = false;
+                rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime * friction);
+                if (getUpProgress < 100)
+                {
+                    getUpProgress += Input.GetAxis("Vertical");
+                }
+                else
+                {
+                    fallen = false;
+                    checkState = true;
+                }
+                break;
             case MoveState.standing:
-                //align with surface?
                 //probably set an idle animation
 
                 rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime * friction);
@@ -257,7 +273,12 @@ public class PlayerController : MonoBehaviour {
         bool onLedge = CheckLedge();
 
         //determine movestate
-        if (onLedge)
+        if (fallen)
+        {
+            getUpProgress = 0;
+            moveState = MoveState.getup;
+        }
+        else if (onLedge)
         {
             climbDestination = transform.position + offset + new Vector3(0, 1f, 0);
             moveState = MoveState.ledgegrab;
