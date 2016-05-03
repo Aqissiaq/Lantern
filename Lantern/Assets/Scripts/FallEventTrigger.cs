@@ -13,7 +13,7 @@ public class FallEventTrigger : MonoBehaviour {
     Collider2D col;
     AudioSource audioPlayer;
     //target of movement
-    Vector3 worldTargetPos = new Vector3(300, 20, 0);
+    Vector3 worldTargetPos = new Vector3(290, 24, 0);
 
 
     void Awake()

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-//[ExecuteInEditMode]
 public class DarknessScript : MonoBehaviour {
 
     public Material material;
@@ -11,6 +10,9 @@ public class DarknessScript : MonoBehaviour {
 
     public float updateInterval = .1f;
     private float lastUpdateTime;
+
+    private const float pi = Mathf.PI;
+    private const float e = 2.71828f;
 
     void Start()
     {

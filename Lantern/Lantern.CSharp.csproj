@@ -75,7 +75,9 @@
     <Compile Include="Assets\Scripts\ButtonFunctions.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\CameraTrigger.cs" />
+    <Compile Include="Assets\Scripts\CreditsScroller.cs" />
     <Compile Include="Assets\Scripts\DarknessScript.cs" />
+    <Compile Include="Assets\Scripts\EndGameTrigger.cs" />
     <Compile Include="Assets\Scripts\Fader.cs" />
     <Compile Include="Assets\Scripts\FallEventTrigger.cs" />
     <Compile Include="Assets\Scripts\GirlAudioScript.cs" />
@@ -162,6 +164,8 @@
     <Compile Include="Assets\spine-unity\SkeletonUtility\SkeletonUtilityConstraint.cs" />
     <Compile Include="Assets\spine-unity\SkeletonUtility\SkeletonUtilitySubmeshRenderer.cs" />
     <Compile Include="Assets\spine-unity\SpineAttributes.cs" />
+    <Compile Include="Assets\texture\ApplyShader.cs" />
+    <Compile Include="Assets\texture\smoke\MouseSmoke.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Environment art\Shaders and stuff\DarknessShader.shader" />
@@ -254,6 +258,8 @@
     <None Include="Assets\spine-unity\Shaders\SkeletonLit.shader" />
     <None Include="Assets\spineData\spineData\girl_final.atlas.txt" />
     <None Include="Assets\spineData\spineData\girl_final.json.txt" />
+    <None Include="Assets\spineData\spineData_(4)\spineData\girl_final.atlas.txt" />
+    <None Include="Assets\spineData\spineData_(4)\spineData\girl_final.json.txt" />
     <None Include="Assets\texture\smoke\SmokeShader.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

@@ -66,6 +66,12 @@ public class CameraController : MonoBehaviour {
         //make sure FoV matches zoom
         parallaxFar.fieldOfView = Mathf.Atan(mainCam.orthographicSize / 10) * Mathf.Rad2Deg;
         parallaxNear.fieldOfView = Mathf.Atan(mainCam.orthographicSize / 10) * Mathf.Rad2Deg * 2f;
+        //ensure player targeting when needed
+        if (Vector3.Distance(playerTransform.position, transform.position) > 25)
+        {
+            ResetTarget();ResetOffset();
+        }
+
 
         CameraMove();
 
@@ -118,6 +124,11 @@ public class CameraController : MonoBehaviour {
         {
             result = Vector3.MoveTowards(result, new Vector3(result.x, platformYPos + 8, result.z), lerpSpeed / 10);
         }
+
+        //make sure the camera never leaves the level to the left
+        float lockedX = Mathf.Clamp(result.x, 6, 9001);
+        result = new Vector3(lockedX, result.y, result.z);
+
 
         //move camera
         transform.position = result;

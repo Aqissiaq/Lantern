@@ -27,10 +27,13 @@ public class PlayerController : MonoBehaviour {
     GameObject ledgeCheckObject;
     Collider2D ledgeCheck;
     Rigidbody2D rb;
+    GameObject girl;
+    AnimationController anim;
+    float getUpDuration;
 
     public MoveState moveState;
-    [HideInInspector]
-    public bool fallen;
+    //[HideInInspector]
+    public bool fallen = true;
     [HideInInspector]
     public float getUpProgress;
     bool jumping;
@@ -43,8 +46,10 @@ public class PlayerController : MonoBehaviour {
     bool checkState = true;
     Vector3 climbDestination;
     Vector3 offset;
-    bool xClimbed;
-    bool yClimbed;
+    [HideInInspector]
+    public bool xClimbed;
+    [HideInInspector]
+    public bool yClimbed;
     [HideInInspector]
     public Vector2 moveVector;
 
@@ -60,9 +65,11 @@ public class PlayerController : MonoBehaviour {
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        girl = GameObject.Find("Girl");
         camController = GameObject.Find("Camera container").GetComponent<CameraController>();
         camCollider = GameObject.Find("Camera container").GetComponent<Collider2D>();
         col = GetComponent<Collider2D>();
+        anim = GetComponent<AnimationController>();
 
         ledgeCheckObject = GameObject.Instantiate(ledgeCheckCollider);
         ledgeCheck = ledgeCheckObject.GetComponent<Collider2D>();
@@ -72,10 +79,21 @@ public class PlayerController : MonoBehaviour {
     {
         Physics2D.IgnoreCollision(col, ledgeCheck);
         Physics2D.IgnoreCollision(col, camCollider);
+        getUpDuration = 3.3f;
+
+        Fall();
     }
 
     void Update()
     {
+        //keeping girl in place
+        if (moveState != MoveState.ledgegrab)
+        {
+           girl.transform.localPosition = Vector3.Lerp(girl.transform.localPosition,
+                                                            new Vector3(girl.transform.localPosition.x, -3.2f, 0),
+                                                            Time.deltaTime * 10);
+        }
+
         //keeping zPos == 0
         if (transform.position.z != 0)
         {
@@ -131,9 +149,9 @@ public class PlayerController : MonoBehaviour {
             case MoveState.getup:
                 checkState = false;
                 rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime * friction);
-                if (getUpProgress < 100)
+                if (getUpProgress < getUpDuration)
                 {
-                    getUpProgress += Input.GetAxis("Vertical");
+                    getUpProgress += Mathf.Max(Input.GetAxis("Vertical"), Mathf.Abs(Input.GetAxis("Horizontal"))) * Time.deltaTime;
                 }
                 else
                 {
@@ -142,8 +160,6 @@ public class PlayerController : MonoBehaviour {
                 }
                 break;
             case MoveState.standing:
-                //probably set an idle animation
-
                 rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, Time.deltaTime * friction);
                 break;
 
@@ -216,6 +232,9 @@ public class PlayerController : MonoBehaviour {
                 if (!yClimbed && Input.GetAxis("Vertical") > 0)
                 {
                     rb.MovePosition(transform.position + yClimb * Time.deltaTime * 10);
+                    girl.transform.localPosition = Vector3.Lerp(girl.transform.localPosition,
+                                                            new Vector3(girl.transform.localPosition.x, -5, 0),
+                                                            Time.deltaTime * 10);
                 }
 
                 //then horizontally
@@ -372,6 +391,11 @@ public class PlayerController : MonoBehaviour {
                 break;
         }
         return o;
+    }
+
+    public void Fall()
+    {
+        fallen = true;
     }
 
     //function to move player arbitrarily (not used atm)

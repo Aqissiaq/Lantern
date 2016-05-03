@@ -5,6 +5,7 @@ public class NextLevelScript : MonoBehaviour {
 
     LevelLoaderScript levelLoader;
     public GameObject obj;
+    public int level;
 
     void Update()
     {
@@ -23,7 +24,7 @@ public class NextLevelScript : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            levelLoader.StartCoroutine(levelLoader.LoadScene(2));
+            levelLoader.StartCoroutine(levelLoader.LoadScene(level));
         }
     }
 }

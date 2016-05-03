@@ -9,8 +9,10 @@ public class AnimationController : MonoBehaviour {
     GirlAudioScript girlAudio;
     GameObject girl;
     Rigidbody2D playerRb;
-    SkeletonAnimation skeletonAnimation;
-    Spine.SkeletonData skeletonData;
+    [HideInInspector]
+    public SkeletonAnimation skeletonAnimation;
+    [HideInInspector]
+    public Spine.SkeletonData skeletonData;
     Spine.Skeleton skeleton;
     Spine.AnimationStateData state;
     //animations
@@ -20,9 +22,12 @@ public class AnimationController : MonoBehaviour {
     public Spine.Animation fall;
     public Spine.Animation ledgeGrab;
 
-    [Header("Food tranforms for footsteps")]
+    [Header("Foot tranforms for footsteps")]
     public Transform frontFootTransform;
     public Transform rearFootTransform;
+
+
+    private float stupidTimer = .5f;
     #endregion
 
     void Awake()
@@ -34,7 +39,10 @@ public class AnimationController : MonoBehaviour {
         skeletonAnimation = GetComponentInChildren<SkeletonAnimation>();
         skeletonData = skeletonAnimation.Skeleton.Data;
         skeleton = new Spine.Skeleton(skeletonData);
+        skeletonAnimation.AnimationName = "get up";
+        skeletonAnimation.timeScale = 100;
     }
+
 
     void Update()
     {
@@ -71,6 +79,20 @@ public class AnimationController : MonoBehaviour {
     {
         switch (playerController.moveState)
         {
+            case PlayerController.MoveState.getup:
+                skeletonAnimation.loop = false;
+                skeletonAnimation.AnimationName = "get up";
+
+                if (Input.GetAxis("Vertical") > 0 || Mathf.Abs(Input.GetAxis("Horizontal")) > 0 || stupidTimer >= 0)
+                {
+                    skeletonAnimation.timeScale = 1;
+                    stupidTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    skeletonAnimation.timeScale = Mathf.Lerp(skeletonAnimation.timeScale, 0, Time.deltaTime * 10);
+                }
+                break;
             case PlayerController.MoveState.standing:
                 skeletonAnimation.loop = true;
                 skeletonAnimation.timeScale = 1;
@@ -88,22 +110,28 @@ public class AnimationController : MonoBehaviour {
                 skeletonAnimation.AnimationName = "jump";
                 break;
             case PlayerController.MoveState.ledgegrab:
+                skeletonAnimation.loop = false;
+                if ((!playerController.yClimbed && Input.GetAxis("Vertical") > 0)
+                    || !playerController.xClimbed && Input.GetAxis("Horizontal") > 0)
+                {
+                    skeletonAnimation.timeScale = 3;
+                }
+                else
+                {
+                    skeletonAnimation.timeScale = 0;
+                }
+                skeletonAnimation.AnimationName = "grab";
                 break;
             case PlayerController.MoveState.falling:
                 skeletonAnimation.loop = false;
                 skeletonAnimation.timeScale = -.5f;
-                skeletonAnimation.AnimationName = "jump";
+                skeletonAnimation.AnimationName = "fall";
                 break;
             default:
                 skeletonAnimation.loop = true;
                 skeletonAnimation.timeScale = 1;
-                skeletonAnimation.AnimationName = "idle";
+                skeletonAnimation.AnimationName = "get up";
                 break;
         }
-    }
-
-    void AnimatorSetup()
-    {
-        
     }
 }

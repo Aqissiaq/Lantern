@@ -3,12 +3,13 @@
 	Properties
 	{
 		_MainTex("Base (RGB)", 2D) = "white" {}
+		_AdditionTex("Additional smoke", 2D) = "white" {}
 
 	_Pixels("Pixels in a quad", Float) = 2048
 
-		_Transmission("Transmission", Vector) = (500, 0, 0, 0)
+		_Transmission("Transmission", Vector) = (5, 0, 0, 0)
 		_Dissipation("Dissipation", Range(0,1)) = 0.1
-		_SpiralParameters("Spiral Parameters", Vector) = (1, 1, 0, 0)
+		_AdditionOffset("Additive offset", Vector) = (0, 0, 0, 0)
 
 	}
 
@@ -29,8 +30,9 @@
 #include "UnityCG.cginc"
 
 		uniform sampler2D _MainTex;
+	sampler2D _AdditionTex;
+	float4 _AdditionOffset;
 	half _Pixels;
-	float2 _SpiralParameters;
 
 	half4 _Transmission;
 	half _Dissipation;
@@ -86,8 +88,10 @@
 		factor = -0.003;
 	cc += factor;
 
-	return float4(1, 1, 1, cc);
+	cc += tex2D(_AdditionTex, i.uv + _AdditionOffset.xy).a * .01;
 
+
+	return float4(0.01, 0.01, 0.01, cc);
 	}
 		ENDCG
 	}

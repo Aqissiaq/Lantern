@@ -94,7 +94,7 @@ public class WaterScript : MonoBehaviour {
             meshObjects[i] = Instantiate(waterMesh, Vector3.zero, Quaternion.identity) as GameObject;
             meshObjects[i].GetComponent<MeshFilter>().mesh = meshes[i];
             meshObjects[i].transform.parent = transform;
-            meshObjects[i].layer = 8; //set meshes to parallax layer for shading
+            meshObjects[i].layer = 0; //set meshes to parallax layer for shading
 
             colliders[i] = new GameObject();
             colliders[i].name = "Trigger";
